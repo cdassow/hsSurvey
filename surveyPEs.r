@@ -83,7 +83,7 @@ recapturedNow=lmb%>%
 #combinbing collected, mark, recap data
 recapStats=merge(collectedNow, markedNow, by="batch", all=T)
 recapStats=merge(recapStats, recapturedNow, by="batch", all=T)
-recapStats$recapturedNow[c(1:2,4)]=0 # no recaps on the first and second samples
+recapStats$recapturedNow[c(2:3)]=0 # no recaps on the first and second samples
 
 #calculate markedPrior for each sample
 recapStats$markedPrior=numeric(nrow(recapStats)) #fills in all 0s, which is what we want for the first sample anyway
@@ -278,8 +278,6 @@ lmb$batch[lmb$sampleID%in%samp[21:22]]=7
 lmb$batch[lmb$sampleID%in%samp[23]]=8
 lmb$batch[lmb$sampleID%in%samp[24]]=9
 lmb$batch[lmb$sampleID%in%samp[25]]=10
-
-
 
 
 #collected now
