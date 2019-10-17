@@ -7,17 +7,22 @@ rm(list=ls())
 #load any packages we'll need
 library(dplyr)
 library(ggplot2)
+
 #### PULLING IN DATA ####
 #load PE data, fish info data, lake info data
 
 #PE data from PEs calculated on a separate script
-setwd("~/../Box Sync/NDstuff/CNH/hsSurvey") #Colin's working directory
+#setwd("~/../Box Sync/NDstuff/CNH/hsSurvey") #Colin's working directory
 
 pes1=read.csv("2019PEs.csv", header = T, stringsAsFactors = F) #2019 lake PEs
 pes2=read.csv("fishscapes2018_peSum_20180914.csv", header = T, stringsAsFactors = F) #2018 lakePEs
 
 #bring in lake info
 linfo=read.csv("biocom_Lakes.csv", header = T, stringsAsFactors = F) #lake characteristic information
+
+#drivers log for 2019 shocking temp, pH, conductivity
+dlog19=read.csv("driversLog2019.csv", header = T, stringsAsFactors = F)
+dlog18=read.csv("driversLog_condTemp.csv", header = T, stringsAsFactors = F)
 
 #bringin lakeID info from mfe db
 setwd("~/../Box Sync/NDstuff/ND_R")
@@ -56,6 +61,17 @@ for(i in 1:nrow(fish)){
 }
   
 #### ORGANIZE DATA ####
+
+#combine and standardize conductivity, temp, ph data from 2018 in db and 2019 (drivers log)
+d19=dlog19%>%
+  group_by(lakeID)%>%
+  summarise(meanCond=mean(conductivity))
+d18=dlog18%>%
+  group_by(lakeID)%>%
+  summarise(meanCond=mean(SpC))
+
+logCond=bind_rows(d19,d18)
+
 #combining and standardizing the PE data 
 
 #see what info each table has
@@ -85,6 +101,7 @@ str(linfo)
 
 #use db table to match our mfe lakeIDs to statewide WBICs
 wbics=dbLinfo[dbLinfo$lakeID%in%pes$lakeID,]
+wbics$WBIC=as.numeric(wbics$WBIC)
 dbLinfo$WBIC=as.numeric(dbLinfo$WBIC)
 linfo=linfo[linfo$WBIC%in%wbics$WBIC,]
 
@@ -94,6 +111,13 @@ lperms=left_join(x=wbics, y=linfo, by="WBIC")%>%
   rename("lakeID"="lakeID.x", "lakeName"="lakeName.x")
 #we have one issue to deal with. Some lakes we don't have perimeters and conductances for so I'm pulling those manually from the DNR website and drivers log
 
+#assigning conductances to the appropriate lakes
+lakes=unique(lperms$lakeID)
+for(i in 1:length(lakes)){
+  if(any(logCond$lakeID==lakes[i])){
+  lperms$conductance[lperms$lakeID==lakes[i]]=logCond$meanCond[logCond$lakeID==lakes[i]]
+  }
+}
 #Bay lake row 2 of lperms is the row we need to change.
 lperms$perimeter[2]=7.69 #km
 lperms$conductance[2]=22.34 #mean cond for surfacee water in bay pulled form mfe db
@@ -104,22 +128,19 @@ lperms$maxDepth[5]=6.4 #m
 
 #hunter lake row6
 lperms$perimeter[6]= 5.13 #km
-lperms$conductance[6]= 23.5 #SPC
 
 #lake of the hills row9
+lperms$WBIC[9]=1620500 #from widnr
 lperms$perimeter[9]=2.35#km
-lperms$conductance[9]=90.7 #spc
 
 #street lake row 11
 lperms$perimeter[11]=3.05 #km
 
 #silver lake row 12
 lperms$perimeter[12]=2.2 #km
-lperms$conductance[12]=233.8 #spc
 
 #upper gresham row 14
 lperms$perimeter[14]=9.32 #km
-lperms$conductance[14]=114.3 #spc
 
 #white birch lake row 15
 lperms$perimeter[15]=3.7 #km
@@ -130,7 +151,6 @@ lperms$conductance[16]=169.6
 
 #wabasso lake row 17
 lperms$perimeter[17]=2.12 #km
-lperms$conductance[17]= 7.4 #spc
 
 
 
@@ -172,6 +192,15 @@ full=all%>%
   left_join(lkCPE, by='lakeID')%>%
   mutate(fishPerKM=nHat/perimeter)
 
+#adding column with max fish size
+full$maxSize=numeric(nrow(full))
+
+for(i in 1:nrow(full)){
+  full$maxSize[i]=max(fish$fishLength[fish$lakeID==full$lakeID[i]], na.rm = T)
+}
+
+write.csv(full, "pe_cpue_ModelBuild.csv", row.names = F)
+
 #### MODEL DATA ####
 
 ggplot(full,aes(x=fishPerKM, y=lkmeanCPE))+
@@ -184,5 +213,3 @@ summary(fit0)
 fitCond=glm(full$lkmeanCPE~full$fishPerKM+full$conductance)
 summary(fitCond)  
 
-fitCond2=glm(full$lkmeanCPE~full$fishPerKM + (full$fishPerKM*full$conductance))
-summary(fitCond2)
