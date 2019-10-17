@@ -13,7 +13,7 @@ library(ggplot2)
 
 #PE data from PEs calculated on a separate script
 #setwd("~/../Box Sync/NDstuff/CNH/hsSurvey") #Colin's working directory
-
+setwd("C:/Users/jcaff/Documents/Jones Lab/hsSurvey")
 pes1=read.csv("2019PEs.csv", header = T, stringsAsFactors = F) #2019 lake PEs
 pes2=read.csv("fishscapes2018_peSum_20180914.csv", header = T, stringsAsFactors = F) #2018 lakePEs
 
@@ -212,6 +212,9 @@ ggplot(full,aes(x=fishPerKM, y=lkmeanCPE))+
 fit0=glm(full$lkmeanCPE~full$fishPerKM)
 summary(fit0)
 
-fitCond=glm(full$lkmeanCPE~full$fishPerKM+full$conductance)
+fitCond=lm(full$lkmeanCPE~full$fishPerKM+full$conductance)
 summary(fitCond)  
+
+fitCDepthSize=lm(full$lkmeanCPE~full$fishPerKM+full$conductance+full$maxDepth+full$maxSize)
+summary (fitCDepthSize)
 
