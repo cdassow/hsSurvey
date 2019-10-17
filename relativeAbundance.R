@@ -203,6 +203,8 @@ write.csv(full, "pe_cpue_ModelBuild.csv", row.names = F)
 
 #### MODEL DATA ####
 
+full=read.csv("pe_cpue_ModelBuild.csv", header = T, stringsAsFactors = F)
+
 ggplot(full,aes(x=fishPerKM, y=lkmeanCPE))+
   geom_point()+geom_text(aes(label=lakeID), hjust=-0.5, vjust=-1)
   
