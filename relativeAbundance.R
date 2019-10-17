@@ -209,9 +209,10 @@ ggplot(full,aes(x=fishPerKM, y=lkmeanCPE))+
   geom_point()+geom_text(aes(label=lakeID), hjust=-0.5, vjust=-1)
   
 #glm fits
-fit0=glm(full$lkmeanCPE~full$fishPerKM)
+fit0=lm(full$lkmeanCPE~full$fishPerKM)
 summary(fit0)
 
-fitCond=glm(full$lkmeanCPE~full$fishPerKM+full$conductance)
+fitCond=lm(full$lkmeanCPE~full$fishPerKM+full$conductance)
 summary(fitCond)  
+
 
