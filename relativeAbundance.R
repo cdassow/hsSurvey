@@ -218,13 +218,14 @@ fitCond=lm(full$lkmeanCPE~full$fishPerKM+full$conductance)
 summary(fitCond)  
 
 
-=======
+
 summary(fitCond)  
 
 fitCDepthSize=lm(full$lkmeanCPE~full$fishPerKM+full$conductance+full$maxDepth+full$maxSize)
 summary (fitCDepthSize)
+#testing models
+summary(lm(full$lkmeanCPE~full$conductance+full$surfaceArea+full$maxDepth))#R2 -0.19, p 0.8279
 
-=======
 #script to build relationship between bass population estimates and electrofishing CPUEs and then convert them to relative abundances.
 #10.1.2019 CD
 
