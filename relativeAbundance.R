@@ -226,6 +226,13 @@ summary (fitCDepthSize)
 #testing models
 summary(lm(full$lkmeanCPE~full$conductance+full$surfaceArea+full$maxDepth))#R2 -0.19, p 0.8279
 summary(lm(full$lkmeanCPE~full$maxSize+full$perimeter))#R2 -0.05905, p 0.547
+summary(lm(full$lkmeanCPE~full$conductivityQuintile+full$perimeter))#R2 0.05712, p 0.3722
+summary(lm(full$lkmeanCPE~full$maxSize+full$maxDepth+full$surfaceArea))#R2 -0.1043, p 0.6528
+summary(lm(full$lkmeanCPE~full$fishPerKM+full$conductance))#R2 0.01587, p 0.371
+summary(lm(full$lkmeanCPE~full$fishPerKM+full$conductance+full$surfaceArea))#R2 -0.0811, p 0.574
+summary(lm(full$lkmeanCPE~full$fishPerKM+full$conductance+full$maxSize))#R2 -0.08326, p 0.5793
+
+
 #script to build relationship between bass population estimates and electrofishing CPUEs and then convert them to relative abundances.
 #10.1.2019 CD
 
