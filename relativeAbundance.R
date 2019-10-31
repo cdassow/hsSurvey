@@ -473,7 +473,7 @@ ggplot(full,aes(x=fishPerKM, y=lkmeanCPE))+
 fit0=glm(full$lkmeanCPE~full$fishPerKM)
 summary(fit0)
 
-fitCond=glm(full$lkmeanCPE~full$fishPerKM+full$conductance)
+fitCond=lm(full$lkmeanCPE~full$fishPerKM+full$conductance)
 summary(fitCond)  
 
 fitConSurMax=lm(full$lkmeanCPE~full$fishPerKM+full$conductance+full$surfaceArea+full$maxSize)
