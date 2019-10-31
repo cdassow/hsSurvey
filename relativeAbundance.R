@@ -274,6 +274,8 @@ library(ggplot2)
 
 #PE data from PEs calculated on a separate script
 #setwd("~/../Box Sync/NDstuff/CNH/hsSurvey") #Colin's working directory
+#setwd("C:/Users/jcaff/Documents/Jones Lab/hsSurvey) #John's working directory
+
 
 pes1=read.csv("2019PEs.csv", header = T, stringsAsFactors = F) #2019 lake PEs
 pes2=read.csv("fishscapes2018_peSum_20180914.csv", header = T, stringsAsFactors = F) #2018 lakePEs
