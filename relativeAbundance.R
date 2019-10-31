@@ -491,3 +491,17 @@ summary(fitWS1)
 
 fitWS2=lm(noWS$lkmeanCPE~noWS$fishPerKM+noWS$surfaceArea)
 summary(fitWS2)
+
+fitWS3=lm(noWS$lkmeanCPE~noWS$fishPerKM+noWS$nEvents)
+summary(fitWS3)
+
+fitWS4=lm(noWS$lkmeanCPE~noWS$fishPerKM+noWS$maxSize+noWS$conductance)
+summary(fitWS4)
+
+
+# some plots to look at residuals and covariates and stuff
+plot(full$nHat, full$conductance)
+plot(full$nHat, full$nEvents)
+
+plot(fitWS1$residuals, noWS$conductance[-c(4,9,16)])
+plot(fitWS1$residuals, noWS$fishPerKM[-c(4,9,16)])
