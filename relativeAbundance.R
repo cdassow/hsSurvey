@@ -257,6 +257,8 @@ summary(lm(full$lkmeanCPE~full$lksdCPE+full$maxDepth))#can i use lksdCPE probabl
 
 summary(lm(full$lkmeanCPE~full$maxDepth))#R2 -0.04969, p 0.5714
 
+summary(lm(full$lkmeanCPE~full$fishPerKM+full$maxSize))#R2 -0.06532, p 0.5651
+
 #script to build relationship between bass population estimates and electrofishing CPUEs and then convert them to relative abundances.
 #10.1.2019 CD
 
