@@ -478,3 +478,16 @@ summary(fitCond)
 
 fitConSurMax=lm(full$lkmeanCPE~full$fishPerKM+full$conductance+full$surfaceArea+full$maxSize)
 summary(fitConSurMax)
+
+#making a model fit without the wabasso data (WS)
+
+noWS=full[1:16,]
+
+fitWS=lm(noWS$lkmeanCPE~noWS$fishPerKM+noWS$conductance)
+summary(fitWS)
+
+fitWS1=lm(noWS$lkmeanCPE~noWS$fishPerKM) ## USE THIS MODEL!!!!!!
+summary(fitWS1)
+
+fitWS2=lm(noWS$lkmeanCPE~noWS$fishPerKM+noWS$surfaceArea)
+summary(fitWS2)
