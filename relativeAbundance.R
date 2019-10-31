@@ -240,6 +240,23 @@ summary(lm(full$lkmeanCPE~full$fishPerKM+full$conductance+full$maxSize))#R2 -0.0
 
 summary(lm(full$lkmeanCPE~full$conductance+full$maxDepth))#R2 -0.09988, p 0.6736
 
+summary(lm(full$lkmeanCPE~full$conductance+full$maxDepth+full$fishPerKM))#R2 -0.08335, p 0.5795
+
+summary(lm(full$lkmeanCPE~full$surfaceArea+full$fishPerKM))#R2 -0.1161, p 0.7301
+
+summary(lm(full$lkmeanCPE~full$surfaceArea+full$maxDepth))#R2 -0.1266, p 0.8109
+
+summary(lm(full$lkmeanCPE~full$perimeter+full$conductance))#R2 -0.1324, p 0.7485
+
+summary(lm(full$lkmeanCPE~full$fishPerKM+full$conductance))#R2 0.01587, p 0.371
+
+summary(lm(full$lkmeanCPE~full$fishPerKM+full$conductance+full$maxDepth))#R2 -0.08335, p 0.5795
+
+summary(lm(full$lkmeanCPE~full$lksdCPE+full$maxDepth))#can i use lksdCPE probably not bc CPE andCPE
+#R2 0.856, p 9.372e-06
+
+summary(lm(full$lkmeanCPE~full$maxDepth))#R2 -0.04969, p 0.5714
+
 #script to build relationship between bass population estimates and electrofishing CPUEs and then convert them to relative abundances.
 #10.1.2019 CD
 
