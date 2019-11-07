@@ -26,6 +26,8 @@ dlog19=read.csv("driversLog2019.csv", header = T, stringsAsFactors = F)
 dlog18=read.csv("driversLog_condTemp.csv", header = T, stringsAsFactors = F)
 
 #bringin lakeID info from mfe db
+#John's MFE working directory
+#setwd("C:/Users/jcaff/Documents/Jones Lab/fish/fish_data")
 setwd("~/../Box Sync/NDstuff/ND_R")
 source("dbUtil.r")
 dbTableList()
