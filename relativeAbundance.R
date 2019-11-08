@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 #script to build relationship between bass population estimates and electrofishing CPUEs and then convert them to relative abundances.
 #10.1.2019 CD
 
@@ -27,7 +27,7 @@ dlog18=read.csv("driversLog_condTemp.csv", header = T, stringsAsFactors = F)
 
 #bringin lakeID info from mfe db
 #John's MFE working directory
-#setwd("C:/Users/jcaff/Documents/Jones Lab/fish/fish_data")
+setwd("C:/Users/jcaff/Documents/Jones Lab/fish/fish_data")
 setwd("~/../Box Sync/NDstuff/ND_R")
 source("dbUtil.r")
 dbTableList()
@@ -40,6 +40,7 @@ fishDB$dayOfYear=as.numeric(fishDB$dayOfYear)
 fishDB$projectID=as.numeric(fishDB$projectID)
 fishDB$fishNum=as.numeric(fishDB$fishNum)
 #bring in inseason database
+setwd("C:/Users/jcaff/Documents/Jones Lab/fish/fish_data")
 setwd("C:/Users/jones/OneDrive/temp_fishscapesCSVentries")
 fishI.is=read.csv("fishInfoIS.csv")
 fishS.is=read.csv("fishSamplesIS.csv")
@@ -174,6 +175,15 @@ effort <- fish %>%
   filter(distanceShocked!="NA")%>%
   filter(distanceShocked!=0)
 
+#trying to calculate fishing hours
+hours <- fishS.is %>%
+  filter(gear=="BE")%>%
+  group_by(sampleID) %>%
+  distinct(effort)%>%
+  filter(is.na(effort)==F)%>%
+  filter(effort!="NA")%>%
+  filter(effort!=0)
+
 #number caught
 nDat <- fish %>%
   filter(gear=="BE")%>%
@@ -185,14 +195,33 @@ indvCPE <- nDat %>%
   left_join(effort, by=c("sampleID", "lakeID", "year"))%>%
   mutate(sampleCPE = totalNum/distanceShockedKM)
 
+#Attempting to calculate catch per hour (replacing distanceShockedKM w/ effort)
+indvCPEhr <- hours %>%
+  left_join(nDat, by=c("sampleID"))%>%
+  mutate(sampleCPEhr = totalNum/effort)%>%
+  filter(is.na(sampleCPEhr)==F)%>%
+  filter(sampleCPEhr!="NA")%>%
+  filter(sampleCPEhr!=0)
+  
+
 #CPE for each lake pooled across day and year
 lkCPE <- indvCPE%>%
   group_by(lakeID)%>%
   summarize(lkmeanCPE=mean(sampleCPE, na.rm=T), lksdCPE=sd(sampleCPE, na.rm = T))
 
+#CPEhr for each lake pooled across day and year 
+lkCPEhr <- indvCPEhr%>%
+  group_by(lakeID)%>%
+  summarize(lkmeanCPEhr=mean(sampleCPEhr, na.rm=T), lksdCPEhr=sd(sampleCPEhr, na.rm = T))
+
 #combining all PE & lake characteristic data with CPUE and fishkm data
 full=all%>%
   left_join(lkCPE, by='lakeID')%>%
+  mutate(fishPerKM=nHat/perimeter)
+
+#combining all PE & lake characteristic data with CPUEhr and fishkm data
+full<-all%>%
+  left_join(lkCPEhr, by='lakeID')%>%
   mutate(fishPerKM=nHat/perimeter)
 
 #adding column with max fish size
