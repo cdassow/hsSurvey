@@ -1,4 +1,4 @@
-
+<<<<<<< HEAD
 #script to build relationship between bass population estimates and electrofishing CPUEs and then convert them to relative abundances.
 #10.1.2019 CD
 
@@ -13,7 +13,7 @@ library(ggplot2)
 #load PE data, fish info data, lake info data
 
 #PE data from PEs calculated on a separate script
-#setwd("~/../Box Sync/NDstuff/CNH/hsSurvey") #Colin's working directory
+#setwd("~/../BoxSync/NDstuff/CNH/hsSurvey") #Colin's working directory
 setwd("C:/Users/jcaff/Documents/Jones Lab/hsSurvey")
 pes1=read.csv("2019PEs.csv", header = T, stringsAsFactors = F) #2019 lake PEs
 pes2=read.csv("fishscapes2018_peSum_20180914.csv", header = T, stringsAsFactors = F) #2018 lakePEs
@@ -26,8 +26,6 @@ dlog19=read.csv("driversLog2019.csv", header = T, stringsAsFactors = F)
 dlog18=read.csv("driversLog_condTemp.csv", header = T, stringsAsFactors = F)
 
 #bringin lakeID info from mfe db
-#John's MFE working directory
-setwd("C:/Users/jcaff/Documents/Jones Lab/fish/fish_data")
 setwd("~/../Box Sync/NDstuff/ND_R")
 source("dbUtil.r")
 dbTableList()
@@ -40,7 +38,6 @@ fishDB$dayOfYear=as.numeric(fishDB$dayOfYear)
 fishDB$projectID=as.numeric(fishDB$projectID)
 fishDB$fishNum=as.numeric(fishDB$fishNum)
 #bring in inseason database
-setwd("C:/Users/jcaff/Documents/Jones Lab/fish/fish_data")
 setwd("C:/Users/jones/OneDrive/temp_fishscapesCSVentries")
 fishI.is=read.csv("fishInfoIS.csv")
 fishS.is=read.csv("fishSamplesIS.csv")
@@ -175,15 +172,6 @@ effort <- fish %>%
   filter(distanceShocked!="NA")%>%
   filter(distanceShocked!=0)
 
-#trying to calculate fishing hours
-hours <- fishS.is %>%
-  filter(gear=="BE")%>%
-  group_by(sampleID) %>%
-  distinct(effort)%>%
-  filter(is.na(effort)==F)%>%
-  filter(effort!="NA")%>%
-  filter(effort!=0)
-
 #number caught
 nDat <- fish %>%
   filter(gear=="BE")%>%
@@ -195,33 +183,14 @@ indvCPE <- nDat %>%
   left_join(effort, by=c("sampleID", "lakeID", "year"))%>%
   mutate(sampleCPE = totalNum/distanceShockedKM)
 
-#Attempting to calculate catch per hour (replacing distanceShockedKM w/ effort)
-indvCPEhr <- hours %>%
-  left_join(nDat, by=c("sampleID"))%>%
-  mutate(sampleCPEhr = totalNum/effort)%>%
-  filter(is.na(sampleCPEhr)==F)%>%
-  filter(sampleCPEhr!="NA")%>%
-  filter(sampleCPEhr!=0)
-  
-
 #CPE for each lake pooled across day and year
 lkCPE <- indvCPE%>%
   group_by(lakeID)%>%
   summarize(lkmeanCPE=mean(sampleCPE, na.rm=T), lksdCPE=sd(sampleCPE, na.rm = T))
 
-#CPEhr for each lake pooled across day and year 
-lkCPEhr <- indvCPEhr%>%
-  group_by(lakeID)%>%
-  summarize(lkmeanCPEhr=mean(sampleCPEhr, na.rm=T), lksdCPEhr=sd(sampleCPEhr, na.rm = T))
-
 #combining all PE & lake characteristic data with CPUE and fishkm data
 full=all%>%
   left_join(lkCPE, by='lakeID')%>%
-  mutate(fishPerKM=nHat/perimeter)
-
-#combining all PE & lake characteristic data with CPUEhr and fishkm data
-full<-all%>%
-  left_join(lkCPEhr, by='lakeID')%>%
   mutate(fishPerKM=nHat/perimeter)
 
 #adding column with max fish size
@@ -305,8 +274,6 @@ library(ggplot2)
 
 #PE data from PEs calculated on a separate script
 #setwd("~/../Box Sync/NDstuff/CNH/hsSurvey") #Colin's working directory
-#setwd("C:/Users/jcaff/Documents/Jones Lab/hsSurvey) #John's working directory
-
 
 pes1=read.csv("2019PEs.csv", header = T, stringsAsFactors = F) #2019 lake PEs
 pes2=read.csv("fishscapes2018_peSum_20180914.csv", header = T, stringsAsFactors = F) #2018 lakePEs
@@ -502,8 +469,8 @@ full=read.csv("pe_cpue_ModelBuild.csv", header = T, stringsAsFactors = F)
 ggplot(full,aes(x=fishPerKM, y=lkmeanCPE))+
   geom_point()+geom_text(aes(label=lakeID), hjust=-0.5, vjust=-1)
   
-#glm fits
-fit0=glm(full$lkmeanCPE~full$fishPerKM)
+#lm fits
+fit0=lm(full$lkmeanCPE~full$fishPerKM)
 summary(fit0)
 
 fitCond=lm(full$lkmeanCPE~full$fishPerKM+full$conductance)
@@ -519,7 +486,7 @@ noWS=full[1:16,]
 fitWS=lm(noWS$lkmeanCPE~noWS$fishPerKM+noWS$conductance)
 summary(fitWS)
 
-fitWS1=lm(noWS$lkmeanCPE~noWS$fishPerKM) ## USE THIS MODEL!!!!!!
+fitWS1=lm(noWS$fishPerKM~noWS$lkmeanCPE) ## USE THIS MODEL!!!!!!
 summary(fitWS1)
 
 fitWS2=lm(noWS$lkmeanCPE~noWS$fishPerKM+noWS$surfaceArea)
@@ -532,9 +499,13 @@ fitWS4=lm(noWS$lkmeanCPE~noWS$fishPerKM+noWS$maxSize+noWS$conductance)
 summary(fitWS4)
 
 
-# some plots to look at residuals and covariates and stuff
+# some plots to look at residuals, covariates and stuff
 plot(full$nHat, full$conductance)
 plot(full$nHat, full$nEvents)
 
 plot(fitWS1$residuals, noWS$conductance[-c(4,9,16)])
 plot(fitWS1$residuals, noWS$fishPerKM[-c(4,9,16)])
+plot(fitWS1$residuals, noWS$lkmeanCPE[-c(4,9,16)])
+
+#residuals vs predicted vales
+#lower left point ib residual/meanCPE fits
