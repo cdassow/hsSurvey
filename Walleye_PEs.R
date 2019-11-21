@@ -10,14 +10,29 @@ library(ggplot2)
 #go to hsSurvey folder with creel data
 setwd("C:/Users/Camille/Desktop/Fishscapes/hsSurvey/")
 
-#load data from excel spreadsheet
+#load data from ecreel survey about fishing pressure
 library(readxl)
-creelSurvey_FishPressure <- read_excel("creelSurvey_FishPressure.xlsx")
+creelSurvey <- read_excel("creelSurvey_FishPressure.xlsx")
 View(creelSurvey_FishPressure)
 
-#sort data for walleye, use species column 
-  if(creelSurvey_FishPressure$Species=="walleye"){
-   wallobs <- (creelSurvey_FishPressure$Species=="walleye")
-  }else{
-    othrfish <- creelSurvey_FishPressure$Species 
-  }
+#loading data from creel interview data from vilas
+creel_fishdata <- read_excel("creel_raw_interview_fish_data_VO.xlsx")
+View(creel_raw_interview_fish_data_VO)
+
+#loading data from walleye creel survey sheet
+WALLEYE_CPE <- read_excel("WALLEYE_FALLYOY_CPE.xlsx")
+View(WALLEYE_FALLYOY_CPE)
+
+#ORGANIZE DATA
+
+#take out unique lakes using WBICs
+VilasWal <- WALLEYE_CPE[WALLEYE_CPE$county=="VILAS",]
+
+VilasWal2 <- creelSurvey[creelSurvey$county=="Villas",]
+
+vilaswal3 <- creel_fishdata[creel_fishdata$county=="VILAS",]
+
+
+
+
+
