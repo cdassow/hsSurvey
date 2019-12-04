@@ -70,22 +70,59 @@ gdriveURL <- function(x){
 creelwall=gdriveURL("https://drive.google.com/open?id=1-d90GHr4iq_xdycFnkis1VKoYqaps00c")
 head(creelwall)
 #speciescode column, needs to be sorted by county, WBICs
+#note the spelling for the species code columns, they vary in DNR data
+creelwall <- creelwall[grep("X22",creelwall$Species.Code),]
+creelwall <- creelwall[grep("VILAS",creelwall$County),]
+
+
+#potential for loop to combine creel walleye data 
+for ( i in 1:length(nrow)){
+  grep("^Species",colnames(i))
+#searches above vector for columns which begin with "Species" to get species code data
+  names(i)[names(i) == "lake"] <- "waterbody"
+#change spcecies code column names to Species code so I can join 
+  AllWall<- semi_join(X22, by="SpeciesCode")
+#join species by walleye code X22
+  
+}
+
 
 creelwall2=gdriveURL("https://drive.google.com/open?id=1pyCKCcAQZiNZz-tX5U2QnZUc79OQEWX2")
 head(creelwall2)
 #speciescode column, needs to be sorted by county, WBICs
+creelwall2 <- creelwall2[grep("X22",creelwall2$speciesCode),]
+creelwall2 <- creelwall2[grep("VILAS",creelwall$County),]
+#changing column name in first dataset to join with second
+names(creelwall)[names(creelwall) == "Species.Code"] <- "speciesCode"
+#try to join by county or species code?
+
+wallinfo=creelwall%>%full_join(creelwall2,by="speciesCode")
+#error bc of factors with different levels 
 
 creelwall3=gdriveURL("https://drive.google.com/open?id=14IJgKosNX1GF0uOdDf4wZQNqp575px0U")
 head(creelwall3)
 #speciescode column, needs to be sorted by county, WBICs
 
+
+
+
 creelwall4=gdriveURL("https://drive.google.com/open?id=1lxUd742QZMXDQunyFBnENKMYZ1XNM_Pc")
 head(creelwall4)
 #speciescode column, needs to be sorted by county, WBICs
+
+
+
+
 
 creelwall5=gdriveURL("https://drive.google.com/open?id=1UYhbGH28WXjmi-4BzhfwO4KYwrBCNO2Q")
 head(creelwall5)
 #speciescode column, needs to be sorted by county, WBICs
 
+
+
+
+#combine tables using county, then sort by Vilas then gather WBICS for lake info
+#using dplyr
+semi_join(X22,by="")
 
 
