@@ -52,3 +52,40 @@ ALLWalfish=Walfish%>%
 head(ALLWalfish)
 
 
+#method 2 for combining walleye data to make abundance and CPE estimates
+#getting files from google drive 
+
+library(dplyr)
+library(ggplot2)
+
+gdriveURL <- function(x){
+  x =  
+    upURL = sub("^[^=]*", "", x)
+  y1 =  "https://docs.google.com/uc?id"
+  y2 = "&export=download"
+  downURL = paste0(y1,upURL,y2)
+  read.csv(downURL, header = TRUE)
+}
+
+creelwall=gdriveURL("https://drive.google.com/open?id=1-d90GHr4iq_xdycFnkis1VKoYqaps00c")
+head(creelwall)
+#speciescode column, needs to be sorted by county, WBICs
+
+creelwall2=gdriveURL("https://drive.google.com/open?id=1pyCKCcAQZiNZz-tX5U2QnZUc79OQEWX2")
+head(creelwall2)
+#speciescode column, needs to be sorted by county, WBICs
+
+creelwall3=gdriveURL("https://drive.google.com/open?id=14IJgKosNX1GF0uOdDf4wZQNqp575px0U")
+head(creelwall3)
+#speciescode column, needs to be sorted by county, WBICs
+
+creelwall4=gdriveURL("https://drive.google.com/open?id=1lxUd742QZMXDQunyFBnENKMYZ1XNM_Pc")
+head(creelwall4)
+#speciescode column, needs to be sorted by county, WBICs
+
+creelwall5=gdriveURL("https://drive.google.com/open?id=1UYhbGH28WXjmi-4BzhfwO4KYwrBCNO2Q")
+head(creelwall5)
+#speciescode column, needs to be sorted by county, WBICs
+
+
+
