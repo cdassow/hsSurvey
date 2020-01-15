@@ -46,3 +46,27 @@ creeldatawall2<-creeldataVC[creeldataVC$speciesCode=="X22",]
 
 wallinfoV<-walylinfo[walylinfo$county=="Vilas",]
 wallinfo=wallinfoV[grep('Walleye', wallinfoV$fishPresent),]
+#all the lakes from this data have walleye, did grep to make sure
+#wallinfo=wallinfoV[grep('Walleye', wallinfoV$fishPresent),] View(wallinfoV)
+#musky=wallinfoV[grep('Musky', wallinfoV$fishPresent),]
+
+#combining PE data and lake info data by WBICs
+vilasWallinfo<-inner_join(wallinfo,vilaswallPE,by="WBIC")
+
+creeldatawallsort<-creeldatawall[,c(1,2,3,6,15,16,17)]
+#sorting to get columns for wbics lake yr fish counts and fish lengths 
+
+creeldatasort2<-creeldatawall2[,c(1,2,3,6,25,26,30,36,37,38)]
+#sorting to get important columns
+
+vilasWallinfosort<-vilasWallinfo[,c(1:5,13,18,31:40)]
+
+#joining data by wbic, removing columns without important info
+WallData<-full_join(vilasWallinfosort,creeldata,by="WBIC")
+WallData<-WallData[,c(1:33,35)]
+WallData<-WallData[WallData$County=="VILAS",]
+WallData<-WallData[WallData$Species.Code=="X22",]
+#had to resort info from the creel and linfo maybe because of full join instead of inner?
+
+#combine last bit of data
+
