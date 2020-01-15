@@ -45,4 +45,4 @@ creeldatawall2<-creeldataVC[creeldataVC$speciesCode=="X22",]
 #creeldatawall2 now has dnr creel interview data for only vilas county walleye species observations
 
 wallinfoV<-walylinfo[walylinfo$county=="Vilas",]
-wallinfo<-wallinfoV[wallinfoV$fishPresent=="Walleye"]
+wallinfo=wallinfoV[grep('Walleye', wallinfoV$fishPresent),]
