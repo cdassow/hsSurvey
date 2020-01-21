@@ -71,7 +71,7 @@ creelwall=gdriveURL("https://drive.google.com/open?id=1-d90GHr4iq_xdycFnkis1VKoY
 head(creelwall)
 #speciescode column, needs to be sorted by county, WBICs
 #note the spelling for the species code columns, they vary in DNR data
-creelwall <- creelwall[grep("X22",creelwall$Species.Code),]
+creelwall <- creelwall[grep("X22",creelwall$speciesCode),]
 creelwall <- creelwall[grep("VILAS",creelwall$County),]
 
 
@@ -91,25 +91,32 @@ creelwall2=gdriveURL("https://drive.google.com/open?id=1pyCKCcAQZiNZz-tX5U2QnZUc
 head(creelwall2)
 #speciescode column, needs to be sorted by county, WBICs
 creelwall2 <- creelwall2[grep("X22",creelwall2$speciesCode),]
-creelwall2 <- creelwall2[grep("VILAS",creelwall$County),]
+creelwall2 <- creelwall2[grep("VILAS",creelwall2$county),]
 #changing column name in first dataset to join with second
 names(creelwall)[names(creelwall) == "Species.Code"] <- "speciesCode"
 #try to join by county or species code?
 
-wallinfo=creelwall%>%full_join(creelwall2,by="speciesCode")
-#error bc of factors with different levels 
+#wallinfo=creelwall%>%full_join(creelwall2,by="speciesCode")
+#In addition: Warning message:
+#Column `speciesCode` joining factors with different levels, coercing to character vector 
+
+
+#wallinfo=full_join(creelwall,creelwall2, by = "speciesCode")
+
 
 creelwall3=gdriveURL("https://drive.google.com/open?id=14IJgKosNX1GF0uOdDf4wZQNqp575px0U")
 head(creelwall3)
 #speciescode column, needs to be sorted by county, WBICs
-
+creelwall3 <- creelwall3[grep("X22",creelwall3$Species.Code),]
+creelwall3 <- creelwall3[grep("VILAS",creelwall3$County),]
 
 
 
 creelwall4=gdriveURL("https://drive.google.com/open?id=1lxUd742QZMXDQunyFBnENKMYZ1XNM_Pc")
 head(creelwall4)
 #speciescode column, needs to be sorted by county, WBICs
-
+creelwall4 <- creelwall4[grep("X22",creelwall4$fishSpeciesCode),]
+creelwall4 <- creelwall4[grep("VILAS",creelwall4$county),]
 
 
 
@@ -117,12 +124,15 @@ head(creelwall4)
 creelwall5=gdriveURL("https://drive.google.com/open?id=1UYhbGH28WXjmi-4BzhfwO4KYwrBCNO2Q")
 head(creelwall5)
 #speciescode column, needs to be sorted by county, WBICs
-
+creelwall5 <- creelwall5[grep("X22",creelwall5$fishSpeciesCode),]
+creelwall5 <- creelwall5[grep("VILAS",creelwall5$county),]
 
 
 
 #combine tables using county, then sort by Vilas then gather WBICS for lake info
 #using dplyr
-semi_join(X22,by="")
+#wallinfo=semi_join(creelwall,creelwall2,by=c("County","county"))
+#need to edit to determine how to join, may need to subset differently
+
 
 

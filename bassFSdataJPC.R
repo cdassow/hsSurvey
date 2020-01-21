@@ -38,9 +38,16 @@ lakeLMB<-gdriveURL("https://drive.google.com/open?id=1FArMiTuOsoC4E08nssZUpCekSk
 
 ##Organizing data##
 
-#subsetting DNR Bass information to Vilas county
+#subsetting DNR Bass information to Vilas county ### ONLY IF NEEDED
 dnrBassVilas<-dnrBass[dnrBass$county=="VILAS",]
 
+#removing extraneous columns from dnrBass
+dnrBass<-dnrBass[,c(1,2,3,5,12,13,27,28,29)]
+
+#removing extraneous columns from lakeLMB
+lakeLMB<-lakeLMB[,c(1,2,3,4,14)]
+
+#Joing lake info to dnrBass
 
 #joining lake info to dnrBassVilas
 vilasBassLinfo<-semi_join(lakeLMB,dnrBassVilas,by="WBIC")
