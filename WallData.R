@@ -70,3 +70,4 @@ WallData<-WallData[WallData$Species.Code=="X22",]
 
 #combine last bit of data
 
+#start on bluegill data for abundance + lake data 
