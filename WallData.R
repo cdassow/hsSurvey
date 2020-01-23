@@ -7,7 +7,7 @@ rm(list=ls())
 library(dplyr)
 library(ggplot2)
 
-#go to hsSurvey folder with creel data
+#go to hsSurvey folder 
 setwd("C:/Users/Camille/Desktop/Fishscapes/hsSurvey/")
 
 gdriveURL <- function(x){
@@ -31,31 +31,39 @@ walylinfo<-gdriveURL("https://drive.google.com/open?id=1RiiiT4nmAkWyYIr7VmPk3iPC
 #subset data for vilas and walleye species 
 walldnrvilas<-walldnr[walldnr$county=="VILAS",]
 vilaswallPE<-walldnrvilas[walldnrvilas$species=="WALLEYE",]
-#vilaswallPE now has dnr walleye PE data for only vilas county walleye species observations
+vilaswallPE<- vilaswallPE[,c(1,2,3,5,19:27)]
+#vilaswallPE now has dnr walleye, PE data for only vilas county walleye species observations
 
 creeldata<-creelindata[creelindata$county=="VILAS",]
 creeldatawall<-creeldata[creeldata$speciesCode=="X22",]
-#creeldatawall2 now has dnr creel interview data for only vilas county walleye species observations
+creeldatawall<-creeldatawall[,c(1,2,3,6,15,16,17)]
+#sorting to get columns for wbics lake yr fish counts and fish lengths 
+#sorting to get important columns
+#creeldatawall now has dnr creel interview data for only vilas county walleye species observations
 
 wallinfoV<-walylinfo[walylinfo$county=="Vilas",]
 wallinfo=wallinfoV[grep('Walleye', wallinfoV$fishPresent),]
 #all the lakes from this data have walleye, did grep to make sure
 #wallinfo=wallinfoV[grep('Walleye', wallinfoV$fishPresent),] View(wallinfoV)
-# example looking for musky, musky=wallinfoV[grep('Musky', wallinfoV$fishPresent),]
+#musky=wallinfoV[grep('Musky', wallinfoV$fishPresent),]
 
 #combining PE data and lake info data by WBICs
-vilasWallinfo<-inner_join(wallinfo,vilaswallPE,by="WBIC")
 
-creeldatasort<-creeldatawall[,c(1,2,3,6,25,26,30,36,37,38)]
-#sorting to get important columns
+vilasWallLinfo<-semi_join(walylinfo,walldnr,by="WBIC")
+vilasWall=walldnr%>%
+  inner_join(walylinfo,by="WBIC")
 
-vilasWallinfosort<-vilasWallinfo[,c(1:5,13,18,31:40)]
+wbicsYear<-vilasWallLinfo[,c(1,2,3,4)]
+wbicsVilasWallUniq<-unique(wbicsYear)
 
-#joining data by wbic, removing columns without important info
-WallData<-full_join(vilasWallinfosort,creeldatasort,by="WBIC")
-WallData<-WallData[WallData$County=="VILAS",]
-WallData<-WallData[WallData$Species.Code=="X22",]
-#had to resort info from the creel and linfo maybe because of full join instead of inner?
+wbicsYearCreelwall<-creeldatawall[,c(1,2,3,4)]
+wbicsCreelwallUniq<-unique(wbicsYearCreelwall)
 
-#combine last bit of data
+names(wbicsCreelwallUniq)[names(wbicsCreelwallUniq) == "surveyYearCreel"] <- "surveyYear"
+
+
+#joining bass abundance to creel surveys
+
+vilasWBICSWall=inner_join(wbicsVilasWallUniq,wbicsCreelwallUniq,by=c("WBIC","county","lakeName"))
+
 
