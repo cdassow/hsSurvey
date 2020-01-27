@@ -49,20 +49,16 @@ wallinfo=wallinfoV[grep('Walleye', wallinfoV$fishPresent),]
 
 #combining PE data and lake info data by WBICs
 
-vilasWallLinfo<-semi_join(walylinfo,walldnr,by="WBIC")
-vilasWall=walldnr%>%
-  inner_join(walylinfo,by="WBIC")
+vilasWallLinfo<-left_join(walldnrvilas,walylinfo)
+#join by columns with the same name,by = c("county", "WBIC")
 
-wbicsYear<-vilasWallLinfo[,c(1,2,3,4)]
-wbicsVilasWallUniq<-unique(wbicsYear)
+
+wbicsYear<-vilasWallLinfo[,c(1,2,3,5,16,18,19,23,24,27)]
 
 wbicsYearCreelwall<-creeldatawall[,c(1,2,3,4)]
-wbicsCreelwallUniq<-unique(wbicsYearCreelwall)
+#joining creel and lake characterisitcs and fish data together
+wbicsCreelLinfo<-left_join(vilasWallLinfo,wbicsYearCreelwall)
 
-names(wbicsCreelwallUniq)[names(wbicsCreelwallUniq) == "surveyYearCreel"] <- "surveyYear"
-
-
-#joining bass abundance to creel surveys
 
 vilasWBICSWall=inner_join(wbicsVilasWallUniq,wbicsCreelwallUniq,by=c("WBIC","county","lakeName"))
 
