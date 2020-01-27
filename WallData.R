@@ -59,7 +59,6 @@ wbicsYearCreelwall<-creeldatawall[,c(1,2,3,4)]
 #joining creel and lake characterisitcs and fish data together
 wbicsCreelLinfo<-left_join(vilasWallLinfo,wbicsYearCreelwall)
 
-
-vilasWBICSWall=inner_join(wbicsVilasWallUniq,wbicsCreelwallUniq,by=c("WBIC","county","lakeName"))
+#need to check years for electrofishing data
 
 
