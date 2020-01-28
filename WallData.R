@@ -78,3 +78,13 @@ creeldatawall<-creelindata[creelindata$speciesCode=="X22",]
 creelwall<-creeldatawall[,c(1:3,6,12,18,26,25,30,35)]
 
 #equation for whole boat CPUE [[time(end-start)-notfish]x number of anglers]/catch
+#creating loop to calculate CPUEs for each row 
+BoatCPUE <- for(i in 1:nrow(data)){
+  time <- data[,7]-data[,8]
+  num <- time - data[,9]
+  CPUE <- num*data[,6]/data[10]
+  
+  
+  
+  
+  
