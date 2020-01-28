@@ -59,6 +59,22 @@ wbicsYearCreelwall<-creeldatawall[,c(1,2,3,4)]
 #joining creel and lake characterisitcs and fish data together
 wbicsCreelLinfo<-left_join(vilasWallLinfo,wbicsYearCreelwall)
 
+wbicsunique<-unique(wbicsCreelLinfo$WBIC)
+wbicsunique
+
 #need to check years for electrofishing data
 
+#bringing in Walleye PE from DNR/fishscapes data
 
+walltreaty<-gdriveURL("https://drive.google.com/open?id=1EYaQpLr_Hp9YbARWFS3tgE6L_tEtWV0G")
+
+#see how many years of data there is for walleye population estimates
+unique(walltreaty$surveyYear)
+#1995-2015, 18 yrs
+
+#find CPUE catch/effort
+#sorting for walleye species by code,
+creeldatawall<-creelindata[creelindata$speciesCode=="X22",]
+creelwall<-creeldatawall[,c(1:3,6,12,18,26,25,30,35)]
+
+#equation for whole boat CPUE [[time(end-start)-notfish]x number of anglers]/catch
