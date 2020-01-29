@@ -83,6 +83,10 @@ BoatCPUE <- for(i in 1:nrow(data)){
   time <- data[,7]-data[,8]
   num <- time - data[,9]
   CPUE <- num*data[,6]/data[10]
+   mutate(x, CPUE = CPUE)
+  }
+
+BoatCPUE(creelwall)  
   
   
   
