@@ -68,6 +68,8 @@ wbicsunique
 
 walltreaty<-gdriveURL("https://drive.google.com/open?id=1EYaQpLr_Hp9YbARWFS3tgE6L_tEtWV0G")
 
+#removing unimportant info
+wallPE<-walltreaty[,c(1:4,8,11)]
 #see how many years of data there is for walleye population estimates
 unique(walltreaty$surveyYear)
 #1995-2015, 18 yrs
@@ -95,3 +97,8 @@ creelwall<-creeldatawall[,c(1:3,6,12,18,26,25,30,35)]
 
 
 
+
+
+
+#have some CPUE and treaty PEs need to see which WBICS both tables have to do comparison
+#check wbics for electrofishing data
