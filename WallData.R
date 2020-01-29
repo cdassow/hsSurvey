@@ -79,20 +79,18 @@ creelwall<-creeldatawall[,c(1:3,6,12,18,26,25,30,35)]
 
 #equation for whole boat CPUE [[time(end-start)-notfish]x number of anglers]/catch
 #creating loop to calculate CPUEs for each row 
-BoatCPUE <- function(x){
-  for(i in 1:nrow(x)){
+  for(i in 1:nrow(creelwall)){
   #end time - start time
-  time <- x[,7]-x[,8]
+  time <- creelwall[,7]-creelwall[,8]
   #time - non fishing time
-  num <- time - x[,9]
+  num <- time - creelwall[,9]
   #total fish time multiplied by the # of anglers divded by catch
-  CPUE <- num*x[,6]/x[10]
+  CPUE <- num*creelwall[,6]/creelwall[10]
   #create CPUE column
-  mutate(x, CPUE = CPUE)
+  creelwall$CPUE[i]=CPUE
   }
-}
 
-BoatCPUE(creelwall)  
+
 
 
 
