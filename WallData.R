@@ -79,6 +79,28 @@ unique(walltreaty$surveyYear)
 creeldatawall<-creelindata[creelindata$speciesCode=="X22",]
 creelwall<-creeldatawall[,c(1:3,6,12,18,26,25,30,35)]
 
+#adjusting date columns for creel data, to reflect time and not regular integers
+for (i in 1:length(creelwall$timeStart)) {
+  if (nchar(creelwall$timeStart[i])<4){
+    creelwall$timeStart[i]<-paste("0",creelwall$timeStart[i],sep = "")
+  }
+}
+
+for (i in 1:length(creelwall$timeEnd)) {
+  if (nchar(creelwall$timeEnd[i])<4){
+    creelwall$timeEnd[i]<-paste("0",creelwall$timeEnd[i],sep = "")
+  }
+}
+
+#create dateSet Column
+vilasCreelWall$dateSet<-paste(creelwall$dateSample,creelwall$timeStart)
+vilasCreelWall$dateSet<-as.POSIXct(creelwall$dateSet,format="%m/%d/%y %H%M")
+
+#create dateSample Column
+vilasCreelWall$dateSample<-paste(creelwall$dateSample,creelwall$timeEnd)
+vilasCreelWall$dateSample<-as.POSIXct(creelwall$dateSample,format="%m/%d/%y %H%M")
+
+
 #equation for whole boat CPUE [[time(end-start)-notfish]x number of anglers]/catch
 #creating loop to calculate CPUEs for each row 
   for(i in 1:nrow(creelwall)){
