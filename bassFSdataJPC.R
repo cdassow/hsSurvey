@@ -121,7 +121,6 @@ vilasCreelLMB$dateSample<-as.POSIXct(vilasCreelLMB$dateSample,format="%m/%d/%y %
 
 ##modifying notFishAmt to time
 
-
 # create a new column to store values as they are manipulated
 vilasCreelLMB$output=rep(NA, nrow(vilasCreelLMB))
 
@@ -156,10 +155,15 @@ vilasCreelLMB2<-vilasCreelLMB2[,c(1:13)]
 vilasCreelLMB2$notFishingAmt[is.na(vilasCreelLMB2$notFishingAmt)]<-0
 
 #calculating effort
-vilasCreelLMB$effort<-difftime(vilasCreelLMB$dateSample,vilasCreelLMB$dateSet,units = "hours","minutes")
+vilasCreelLMB2$fishedPerc<-vilasCreelLMB2$fishedPerc/100
+vilasCreelLMB2$effort<-((difftime(vilasCreelLMB2$dateSample,vilasCreelLMB2$dateSet,units = "hours","minutes"))-vilasCreelLMB2$notFishingAmt)*vilasCreelLMB2$fishedPerc
 
+vilasCreelLMB2$effort<-as.numeric(vilasCreelLMB2$effort)
+#calculating anglerCPUE
 
+vilasCreelLMB2$anCPUE<-(vilasCreelLMB2$caughtAmt/(vilasCreelLMB2$effort*vilasCreelLMB2$anglersAmt))
 
+vilasAnCPUE<-vilasCreelLMB2[,c(1,2,3,4,10,13,14,15)]
 
 
 
