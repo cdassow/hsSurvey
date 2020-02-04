@@ -119,70 +119,35 @@ vilasCreelLMB$dateSet<-as.POSIXct(vilasCreelLMB$dateSet,format="%m/%d/%y %H%M")
 vilasCreelLMB$dateSample<-paste(vilasCreelLMB$dateSample,vilasCreelLMB$timeEnd)
 vilasCreelLMB$dateSample<-as.POSIXct(vilasCreelLMB$dateSample,format="%m/%d/%y %H%M")
 
-#modifying notFishAmt to time
-#divide time to introduce decimal between hrs and mins
-for (i in 1:length(vilasCreelLMB$notFishingAmt)){
-  vilasCreelLMB$notFishingAmt[i]<-(vilasCreelLMB$notFishingAmt[i]/100)
-}
+##modifying notFishAmt to time
 
-separate(vilasCreelLMB,vilasCreelLMB$notFishingAmt,into=("Hours","Minutes"), )
-
-#Brit's code
 
 # create a new column to store values as they are manipulated
-fake$output=rep(NA, length(fake))
 vilasCreelLMB$output=rep(NA, nrow(vilasCreelLMB))
 
 # use for loop to make sure every entry have 4 digits
 # this also changes data type to character
 for(i in 1:nrow(vilasCreelLMB)){
   if(nchar(vilasCreelLMB$notFishingAmt[i])==3){
-    fake$output[i]=paste0(0, fake$time[i])
-  }else if(nchar(fake$time[i])==2){
-    fake$output[i]=paste0(0,0, fake$time[i])
+    vilasCreelLMB$output[i]=paste0(0, vilasCreelLMB$notFishingAmt[i])
+  }else if(nchar(vilasCreelLMB$notFishingAmt[i])==2){
+    vilasCreelLMB$output[i]=paste0(0,0, vilasCreelLMB$notFishingAmt[i])
   }else{
-    fake$output[i]=fake$time[i]
+    vilasCreelLMB$output[i]=vilasCreelLMB$notFishingAmt[i]
   }
 }
 
 # use tidyverse seperate to seperate hours from minutes and store in new dataframe 
 library(tidyverse)
-fake2=fake %>% separate(output,c("hour", "min"),sep=c(2,4))
+vilasCreelLMB2= vilasCreelLMB%>% separate(output,c("hour", "min"),sep=c(2,4))
 
 # change both columns to numeric 
-fake2$hour=as.numeric(fake2$hour)
-fake2$min=as.numeric(fake2$min)
+vilasCreelLMB2$hour=as.numeric(vilasCreelLMB2$hour)
+vilasCreelLMB2$min=as.numeric(vilasCreelLMB2$min)
 
 # convert to total hours by multiplying hours by 60 and adding minutes 
-fake2$totalMinutes=fake2$hour+fake2$min/60
+vilasCreelLMB2$adjNotFishAMT=vilasCreelLMB2$hour+vilasCreelLMB2$min/60
 
-#create object for notFishingAmt data; turn values into characters
-notFish<-vilasCreelLMB$notFishingAmt
-notFish<-as.character(notFish)
-
-
-notFishsplit<-notFish
-
-for (i in 1:length(notFish)) {
-  if (notFish[i]=="0"){
-    notFish[i]<-paste("0",notFish[i],sep = "")
-  }
-}
-
-
-for(i in 1:length(notFish)){
-  if (nchar(notFish[i])>2){
-    notFishsplit[i]<-strsplit(notFish[i],split = "\\.")
-  }
-}
-
-for(i in 1:length(notFishsplit)){
-  vilasCreelLMB$notFishingSplit[i]<-notFishsplit
-}
-
-
-#coverting notFishsplit to matrix
-notFish<-matrix(unlist(notFish),ncol = 1,byrow = T)
 
 #calculating effort
 vilasCreelLMB$effort<-difftime(vilasCreelLMB$dateSample,vilasCreelLMB$dateSet,units = "hours","minutes")
