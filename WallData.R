@@ -93,12 +93,57 @@ for (i in 1:length(creelwall$timeEnd)) {
 }
 
 #create dateSet Column
-vilasCreelWall$dateSet<-paste(creelwall$dateSample,creelwall$timeStart)
-vilasCreelWall$dateSet<-as.POSIXct(creelwall$dateSet,format="%m/%d/%y %H%M")
+creelwall$dateSet<-paste(creelwall$dateSample,creelwall$timeStart)
+#John's format 1/1/2020 time, my format 2004-01-24 time
+creelwall$dateSet<-as.POSIXct(creelwall$dateSet,format="%Y-%m-%d %H%M")
 
 #create dateSample Column
-vilasCreelWall$dateSample<-paste(creelwall$dateSample,creelwall$timeEnd)
-vilasCreelWall$dateSample<-as.POSIXct(creelwall$dateSample,format="%m/%d/%y %H%M")
+creelwall$dateSample<-paste(creelwall$dateSample,creelwall$timeEnd)
+creelwall$dateSample<-as.POSIXct(creelwall$dateSample,format="%Y-%m-%d %H%M")
+#modifying for non fish amt time
+creelwall$output=rep(NA, nrow(creelwall))
+
+# use for loop to make sure every entry have 4 digits
+# this also changes data type to character
+for(i in 1:nrow(creelwall)){
+  if(nchar(creelwall$notFishingAmt[i])==3){
+    creelwall$output[i]=paste0(0, creelwall$notFishingAmt[i])
+  }else if(nchar(creelwall$notFishingAmt[i])==2){
+    creelwall$output[i]=paste0(0,0, creelwall$notFishingAmt[i])
+  }else{
+    creelwall$output[i]=creelwall$notFishingAmt[i]
+  }
+}
+
+# use tidyverse seperate to seperate hours from minutes and store in new dataframe 
+library(tidyverse)
+creelwall2= creelwall%>% separate(output,c("hour", "min"),sep=c(2,4))
+
+# change both columns to numeric 
+creelwall2$hour=as.numeric(creelwall2$hour)
+creelwall2$min=as.numeric(creelwall2$min)
+
+# convert to total hours by multiplying hours by 60 and adding minutes 
+creelwall2$adjNotFishAMT=creelwall2$hour+creelwall2$min/60
+
+#entering adjusted notFishAmt back to original column
+creelwall2$notFishingAmt<-creelwall2$adjNotFishAMT
+creelwall2<-creelwall2[,c(1:13)]
+
+#replacing NA's with 0
+creelwall2$notFishingAmt[is.na(creelwall2$notFishingAmt)]<-0
+
+#calculating effort
+creelwall2$effort<-((difftime(creelwall2$dateSample,creelwall2$dateSet,units = "hours","minutes"))-creelwall2$notFishingAmt)
+
+creelwall2$effort<-as.numeric(creelwall2$effort)
+#calculating anglerCPUE
+
+creelwall2$anCPUE<-(creelwall2$fishCount/(creelwall2$effort*creelwall2$anglersAmt))
+
+WallAnCPUE<-creelwall2[,c(1,2,3,4,10,13,14,15)]
+
+
 
 
 #equation for whole boat CPUE [[time(end-start)-notfish]x number of anglers]/catch
