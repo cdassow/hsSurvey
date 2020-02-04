@@ -148,9 +148,19 @@ vilasCreelLMB2$min=as.numeric(vilasCreelLMB2$min)
 # convert to total hours by multiplying hours by 60 and adding minutes 
 vilasCreelLMB2$adjNotFishAMT=vilasCreelLMB2$hour+vilasCreelLMB2$min/60
 
+#entering adjusted notFishAmt back to original column
+vilasCreelLMB2$notFishingAmt<-vilasCreelLMB2$adjNotFishAMT
+vilasCreelLMB2<-vilasCreelLMB2[,c(1:13)]
+
+#replacing NA's with 0
+vilasCreelLMB2$notFishingAmt[is.na(vilasCreelLMB2$notFishingAmt)]<-0
 
 #calculating effort
 vilasCreelLMB$effort<-difftime(vilasCreelLMB$dateSample,vilasCreelLMB$dateSet,units = "hours","minutes")
+
+
+
+
 
 
 #repeating the wbics sort for Creel data
