@@ -140,12 +140,19 @@ creelwall2$effort<-as.numeric(creelwall2$effort)
 #calculating anglerCPUE
 
 creelwall2$anCPUE<-(creelwall2$fishCount/(creelwall2$effort*creelwall2$anglersAmt))
+#select for columns needed to calculate CPUE and the indentifier columns
+WallAnCPUE<-creelwall2[,c(1:5,10,13,14,15)]
+#replace all NAs in df with 0
+WallAnCPUE[is.na(WallAnCPUE)] = 0
+#sort by date to detect duplicate dates for CPUE so that average can be calculated
+DatesortCPUE<-group_by(WallAnCPUE,dateSample)
+#noticing duplicate rows, for same date and CPUE, duplicate observations?
+#need to get unique dates
+WallAnCPUE%>%unique(WallAnCPUE$dateSample)
 
-WallAnCPUE<-creelwall2[,c(1,2,3,4,10,13,14,15)]
 
 
-
-
+#does not work yet
 #equation for whole boat CPUE [[time(end-start)-notfish]x number of anglers]/catch
 #creating loop to calculate CPUEs for each row 
   for(i in 1:nrow(creelwall)){
