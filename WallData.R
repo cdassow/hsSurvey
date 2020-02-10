@@ -166,9 +166,9 @@ WallAnCPUE%>%unique(WallAnCPUE$dateSample)
   creelwall$CPUE[i]=CPUE
   }
 
+#need to combine walldnr and WallAnCPUE
 
-
-
+WallCPUEBE<-left_join(by=c("WBIC","surveyYear","county"),walldnr,WallAnCPUE)
 
 
 
