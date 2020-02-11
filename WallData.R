@@ -146,6 +146,8 @@ WallAnCPUE<-creelwall2[,c(1:5,10,13,14,15)]
 WallAnCPUE[is.na(WallAnCPUE)] = 0
 #sort by date to detect duplicate dates for CPUE so that average can be calculated
 DatesortCPUE<-group_by(WallAnCPUE,dateSample)
+DatesortCPUE<-DatesortCPUE[DatesortCPUE$effort>0,]
+
 #noticing duplicate rows, for same date and CPUE, duplicate observations?
 #need to get unique dates
 WallAnCPUE%>%unique(WallAnCPUE$dateSample)
@@ -169,7 +171,6 @@ WallAnCPUE%>%unique(WallAnCPUE$dateSample)
 #need to combine walldnr and WallAnCPUE
 
 WallCPUEBE<-left_join(by=c("WBIC","surveyYear","county"),walldnr,WallAnCPUE)
-
 
 
 
