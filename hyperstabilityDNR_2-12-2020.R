@@ -180,3 +180,22 @@ ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
 ggplot(data=panJoin,aes(x=panJoin$meanEF_CPEkm,y=panJoin$meanCPUE))+
   geom_point(aes(color=species))+theme(legend.position = "right")
 
+#creating log CPUE and log N columns
+bassJoin$logCPUE=log(bassJoin$meanCPUE)
+bassJoin$logAbun=log(bassJoin$meanEF_CPEkm)
+bassJoin<- bassJoin[is.na(bassJoin$logCPUE)==F,]
+bassJoin<- bassJoin[bassJoin$logCPUE!=-Inf,]
+
+
+wallJoin$logCPUE=log(wallJoin$meanCPUE)
+wallJoin$logAbun=log(wallJoin$meanEF_CPEkm)
+
+panJoin$logCPUE=log(panJoin$meanCPUE)
+panJoin$logAbun=log(panJoin$meanEF_CPEkm)
+
+#general linear model for bass 
+fit1<-glm(bassJoin$logCPUE~bassJoin$logAbun)
+summary(fit1)
+
+plot(x=bassJoin$logAbun,y=bassJoin$logCPUE)
+abline(fit1)
