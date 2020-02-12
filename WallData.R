@@ -147,6 +147,7 @@ WallAnCPUE[is.na(WallAnCPUE)] = 0
 #sort by date to detect duplicate dates for CPUE so that average can be calculated
 DatesortCPUE<-group_by(WallAnCPUE,dateSample)
 DatesortCPUE<-DatesortCPUE[DatesortCPUE$effort>0,]
+DatesortCPUE<-DatesortCPUE[,c(1:6,8:9)]
 
 #noticing duplicate rows, for same date and CPUE, duplicate observations?
 #need to get unique dates
