@@ -77,7 +77,7 @@ bassEF$CPEkm=bassEF$CPEmile/1.60934   # convert fish per mile to fish per km
 bassEF$distanceShockedKm=bassEF$distanceShockedMiles*0.621371 # convert miles to km
 lake_yearBASSef= bassEF %>%
   group_by(WBIC,species,surveyYear) %>%
-  summarize(meanEF_CPE=mean(CPEkm),
+  summarize(meanEF_CPEkm=mean(CPEkm),
             totalFishCaught=sum(totalNumberCaughtFish),
             totalDistShockedKm=sum(distanceShockedKm),
             totalHoursSampled=sum(numberHoursSampled),
@@ -91,7 +91,7 @@ panEF$CPEkm=panEF$CPEmile/1.60934   # convert fish per mile to fish per km
 panEF$distanceShockedKm=panEF$distanceShockedMiles*0.621371 # convert miles to km
 lake_yearPANef= panEF %>%
   group_by(WBIC,species,surveyYear) %>%
-  summarize(meanEF_CPE=mean(CPEkm),
+  summarize(meanEF_CPEkm=mean(CPEkm),
             totalFishCaught=sum(totalNumberCaughtFish),
             totalDistShockedKm=sum(distanceShockedKm),
             totalHoursSampled=sum(numberHoursSampled),
@@ -106,7 +106,7 @@ walleyeEF$distanceShockedKm=walleyeEF$distanceShockedMiles*0.621371 # convert mi
 walleyeEF$totalNumberCaughtFish=as.numeric(gsub(",","",walleyeEF$totalNumberCaughtFish))
 lake_yearWALLef= walleyeEF %>%
   group_by(WBIC,species,surveyYear) %>%
-  summarize(meanEF_CPE=mean(CPEkm),
+  summarize(meanEF_CPEkm=mean(CPEkm),
             totalFishCaught=sum(totalNumberCaughtFish),
             totalDistShockedKm=sum(distanceShockedKm),
             totalHoursSampled=sum(numberHoursSampled),
@@ -114,7 +114,33 @@ lake_yearWALLef= walleyeEF %>%
 lake_yearWALLef=as.data.frame(lake_yearWALLef)
 
 
-##### merge data sets from angling CPUE and electrofishing CPUE
+##### merge data sets from angling CPUE and electrofishing CPUE to get exact lake-year matches
+# convert fishSpeciesCode in lake_yearCPUE to species (name from ef stuff)
+lake_yearCPUE$species=""
+lake_yearCPUE$species[lake_yearCPUE$fishSpeciesCode=="X22"]="WALLEYE"
+lake_yearCPUE$species[lake_yearCPUE$fishSpeciesCode=="W11"]="SMALLMOUTH BASS"
+lake_yearCPUE$species[lake_yearCPUE$fishSpeciesCode=="W12"]="LARGEMOUTH BASS"
+lake_yearCPUE$species[lake_yearCPUE$fishSpeciesCode=="X15"]="YELLOW PERCH"
+lake_yearCPUE$species[lake_yearCPUE$fishSpeciesCode=="W14"]="BLACK CRAPPIE"
+lake_yearCPUE$species[lake_yearCPUE$fishSpeciesCode=="W09"]="BLUEGILL"
+
+# trim species without EF data (can we get other species EF data?)
+lake_yearCPUE=lake_yearCPUE[lake_yearCPUE$species!="",]
+
+bassJoin=left_join(lake_yearBASSef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear"))
+bassJoin=bassJoin[!is.na(bassJoin$meanCPUE),]
+
+panJoin=left_join(lake_yearPANef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear"))
+panJoin=panJoin[!is.na(panJoin$meanCPUE),]
 
 
+wallJoin=left_join(lake_yearWALLef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear"))
+wallJoin=wallJoin[!is.na(wallJoin$meanCPUE),]
 
+table(lake_yearCPUE$species)
+nrow(lake_yearBASSef)
+nrow(bassJoin)
+nrow(lake_yearPANef)
+nrow(panJoin)
+nrow(lake_yearWALLef)
+nrow(wallJoin)
