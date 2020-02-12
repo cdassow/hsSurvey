@@ -144,3 +144,39 @@ nrow(lake_yearPANef)
 nrow(panJoin)
 nrow(lake_yearWALLef)
 nrow(wallJoin)
+
+library(ggplot2)
+
+#plotting angling CPUE vs ef catch/mile for species
+
+#ploting and colors based on wbic, for bass 1-4 plots
+ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
+         geom_point(aes(color=WBIC))
+
+#smooth line making trendline of observations
+ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
+                           geom_smooth(model=lm)
+#connecting with line 
+ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
+  geom_line()
+
+#color coded by LMB or SMB
+ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
+  geom_point(aes(color=species))+theme(legend.position = "right")
+
+#ploting for walleye population
+ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
+  geom_smooth(model=lm)
+
+ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
+  geom_line()
+
+ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
+  geom_point()
+
+
+#plotting for panfish species
+
+ggplot(data=panJoin,aes(x=panJoin$meanEF_CPEkm,y=panJoin$meanCPUE))+
+  geom_point(aes(color=species))+theme(legend.position = "right")
+
