@@ -203,6 +203,7 @@ panJoin$logCPUE=log(panJoin$meanCPUE)
 panJoin$logAbun=log(panJoin$meanEF_CPEkm)
 panJoin<- panJoin[panJoin$logCPUE!=-Inf,]
 
+
 #making upper and lower confidence intervals using std and the mean to helep with measuring betas
 bassJoin$PE.ucl=bassJoin$std+bassJoin$meanCPUE
 bassJoin$PE.lcll=bassJoin$std-bassJoin$meanCPUE
@@ -222,6 +223,16 @@ summary(fit1)
 plot(x=bassJoin$logAbun,y=bassJoin$logCPUE)
 abline(fit1)
 
+#normal spcae plot of model fit to the data, exponential(intercept)*x^slope this is qN^B
+#coefficients 2 is beta
+plot(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE)
+plot(1:65,exp(fit1$coefficients[1])*(1:65)^fit1$coefficients[2])
+#can use lines function as well
+
+ggplot(bassJoin,aes(bassJoin$meanEF_CPEkm,bassJoin$meanCPUE))+
+  geom_point(aes(colour = surveyYear))
+ggplot(fit1,aes(bassJoin$meanEF_CPEkm,bassJoin$meanCPUE))+geom_smooth(model=lm)
+
 #model for panfish, fit summary estimate 0.23189 
 fit2<-glm(panJoin$logCPUE~panJoin$logAbun)
 summary(fit2)
@@ -230,6 +241,12 @@ summary(fit2)
 plot(x=panJoin$logAbun,y=panJoin$logCPUE)
 abline(fit2)
 
+#normal spcae plot of model fit to the data, qN^B
+#coefficients 2 is beta
+plot(x=panJoin$meanEF_CPEkm,y=panJoin$meanCPUE)
+plot(0:160,exp(fit2$coefficients[1])*(0:160)^fit2$coefficients[2])
+
+
 # glmodel for walleye, fit summary estimate 0.63073
 fit3<-glm(wallJoin$logCPUE~wallJoin$logAbun)
 summary(fit3)
@@ -237,6 +254,19 @@ summary(fit3)
 #ploting model with fit line bass log transformed abund. and CPUE
 plot(x=wallJoin$logAbun,y=wallJoin$logCPUE)
 abline(fit3)
+
+#normal spcae plot of model fit to the data, exponential(intercept)*x^slope this is qN^B
+#coefficients 2 is beta
+plot(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE)
+plot(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2])
+
+### Ploting hyperstability ###
+plot(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE)
+lines(1:65,exp(fit1$coefficients[1])*(1:65)^fit1$coefficients[2])
+lines(0:160,exp(fit2$coefficients[1])*(0:160)^fit2$coefficients[2])
+lines(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2])
+
+
 
 #using betaBootstrapping R script to calucate betas from model fit to simulated data
 
