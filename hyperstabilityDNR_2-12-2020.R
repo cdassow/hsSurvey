@@ -8,6 +8,8 @@ setwd("~/Documents/Research/Fishscapes/hyperstability/hsSurvey/")
 source("gdriveURL.R")
 library(dplyr)
 
+### Data Wrangle ####
+
 ######## angling CPUE
 # load creel data from google drive
 creel1=gdriveURL("https://drive.google.com/open?id=1lxUd742QZMXDQunyFBnENKMYZ1XNM_Pc")
@@ -147,7 +149,7 @@ nrow(wallJoin)
 
 library(ggplot2)
 
-#plotting angling CPUE vs ef catch/mile for species
+####### Hyperstability (abund and CPUE plots) #####
 
 #ploting and colors based on wbic, for bass 1-4 plots
 ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
@@ -180,7 +182,10 @@ ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
 ggplot(data=panJoin,aes(x=panJoin$meanEF_CPEkm,y=panJoin$meanCPUE))+
   geom_point(aes(color=species))+theme(legend.position = "right")
 
-#creating log CPUE and log N columns
+######## log values and model fits #######
+
+
+#creating log CPUE and log N columns, removing na's and infinite values so glm can run and we can make fit
 bassJoin$logCPUE=log(bassJoin$meanCPUE)
 bassJoin$logAbun=log(bassJoin$meanEF_CPEkm)
 bassJoin<- bassJoin[is.na(bassJoin$logCPUE)==F,]
@@ -189,13 +194,61 @@ bassJoin<- bassJoin[bassJoin$logCPUE!=-Inf,]
 
 wallJoin$logCPUE=log(wallJoin$meanCPUE)
 wallJoin$logAbun=log(wallJoin$meanEF_CPEkm)
+wallJoin<- wallJoin[wallJoin$logCPUE!=-Inf,]
+
 
 panJoin$logCPUE=log(panJoin$meanCPUE)
 panJoin$logAbun=log(panJoin$meanEF_CPEkm)
+panJoin<- panJoin[panJoin$logCPUE!=-Inf,]
 
-#general linear model for bass 
+#general linear model for bass, using glm function 
 fit1<-glm(bassJoin$logCPUE~bassJoin$logAbun)
 summary(fit1)
 
+#ploting model with fit line bass log transformed abund. and CPUE
 plot(x=bassJoin$logAbun,y=bassJoin$logCPUE)
 abline(fit1)
+
+#model for panfish, fit summary estimate 0.23189 
+fit2<-glm(panJoin$logCPUE~panJoin$logAbun)
+summary(fit2)
+
+#ploting model with fit line log trans. for panfish
+plot(x=panJoin$logAbun,y=panJoin$logCPUE)
+abline(fit2)
+
+# glmodel for walleye, fit summary estimate 0.63073
+fit3<-glm(wallJoin$logCPUE~wallJoin$logAbun)
+summary(fit3)
+
+#ploting model with fit line bass log transformed abund. and CPUE
+plot(x=wallJoin$logAbun,y=wallJoin$logCPUE)
+abline(fit3)
+
+#using betaBootstrapping R script to calucate betas from model fit to simulated data
+
+### Bootstrapping ####
+
+#make d the dataframe you want
+d=bassJoin
+z=d[!duplicated(d$meanEF_CPEkm),]
+agg_logCPUE=log(z$meanCPUE)
+agg_logN=log(z$meanEF_CPEkm)
+aggFit_wLK=glm(agg_logCPUE~agg_logN)
+#estimate agg fit glm summary 0.42386
+summary(aggFit_wLK)
+
+for(i in 1:1000){
+  pe=rlnorm(n=length(z$meanEF_CPEkm), meanlog = log(z$meanEF_CPEkm), sdlog = log((z$meanEF_CPE-z$meanEF_CPEkm)/4))
+  #rlnorm from chpt 14-45 of RMark book
+  #rlnorm prodices NAs, need to remove those
+  pe[1]=352 #becuase our first PE doesn't have CIs it always estimates a NaN so I just set it back to the point estimate. This is also why you get warnings when you run the loop.
+  fit=glm(agg_logCPUE ~ log(pe)+z$meanCPUE)
+  betas[i]=fit$coefficients[2]
+  comp=abs(fit$aic - aggFit_wLK$aic)
+  ps[i]=comp
+}
+
+betas=numeric(1000) #betas from model fit to simulated data
+ps=numeric(1000) #difference in AIC values between the simulated data model fit and the experimental data model fit
+
