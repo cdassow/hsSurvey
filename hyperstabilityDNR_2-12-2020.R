@@ -83,6 +83,7 @@ lake_yearBASSef= bassEF %>%
             totalFishCaught=sum(totalNumberCaughtFish),
             totalDistShockedKm=sum(distanceShockedKm),
             totalHoursSampled=sum(numberHoursSampled),
+            std=sd(CPEkm),
             N=n())
 lake_yearBASSef=as.data.frame(lake_yearBASSef)
 
@@ -97,6 +98,7 @@ lake_yearPANef= panEF %>%
             totalFishCaught=sum(totalNumberCaughtFish),
             totalDistShockedKm=sum(distanceShockedKm),
             totalHoursSampled=sum(numberHoursSampled),
+            std=sd(CPEkm),
             N=n())
 lake_yearPANef=as.data.frame(lake_yearPANef)
 
@@ -112,6 +114,7 @@ lake_yearWALLef= walleyeEF %>%
             totalFishCaught=sum(totalNumberCaughtFish),
             totalDistShockedKm=sum(distanceShockedKm),
             totalHoursSampled=sum(numberHoursSampled),
+            std=sd(CPEkm),
             N=n())
 lake_yearWALLef=as.data.frame(lake_yearWALLef)
 
@@ -191,7 +194,6 @@ bassJoin$logAbun=log(bassJoin$meanEF_CPEkm)
 bassJoin<- bassJoin[is.na(bassJoin$logCPUE)==F,]
 bassJoin<- bassJoin[bassJoin$logCPUE!=-Inf,]
 
-
 wallJoin$logCPUE=log(wallJoin$meanCPUE)
 wallJoin$logAbun=log(wallJoin$meanEF_CPEkm)
 wallJoin<- wallJoin[wallJoin$logCPUE!=-Inf,]
@@ -200,6 +202,17 @@ wallJoin<- wallJoin[wallJoin$logCPUE!=-Inf,]
 panJoin$logCPUE=log(panJoin$meanCPUE)
 panJoin$logAbun=log(panJoin$meanEF_CPEkm)
 panJoin<- panJoin[panJoin$logCPUE!=-Inf,]
+
+#making upper and lower confidence intervals using std and the mean to helep with measuring betas
+bassJoin$PE.ucl=bassJoin$std+bassJoin$meanCPUE
+bassJoin$PE.lcll=bassJoin$std-bassJoin$meanCPUE
+
+wallJoin$PE.ucl=wallJoin$std+wallJoin$meanCPUE
+wallJoin$PE.lcl=wallJoin$std-wallJoin$meanCPUE
+
+panJoin$PE.ucl=panJoin$std+panJoin$meanCPUE
+panJoin$PE.lcl=panJoin$std-panJoin$meanCPUE
+
 
 #general linear model for bass, using glm function 
 fit1<-glm(bassJoin$logCPUE~bassJoin$logAbun)
@@ -229,26 +242,30 @@ abline(fit3)
 
 ### Bootstrapping ####
 
-#make d the dataframe you want
-d=bassJoin
+#make d the dataframe you want, using bass as example
+d=panJoin
 z=d[!duplicated(d$meanEF_CPEkm),]
 agg_logCPUE=log(z$meanCPUE)
+#wallJoin and panJoin agg_logCPUE has Inf value, needs to be removed for glm fit 
 agg_logN=log(z$meanEF_CPEkm)
 aggFit_wLK=glm(agg_logCPUE~agg_logN)
 #estimate agg fit glm summary 0.42386
 summary(aggFit_wLK)
 
+betas=numeric(1000) #betas from model fit to simulated data
+ps=numeric(1000) #difference in AIC values between the simulated data model fit and the experimental data model fit
+
+
 for(i in 1:1000){
-  pe=rlnorm(n=length(z$meanEF_CPEkm), meanlog = log(z$meanEF_CPEkm), sdlog = log((z$meanEF_CPE-z$meanEF_CPEkm)/4))
+  pe=rlnorm(n=length(z$meanEF_CPEkm), meanlog = log(z$meanEF_CPEkm))
   #rlnorm from chpt 14-45 of RMark book
-  #rlnorm prodices NAs, need to remove those
-  pe[1]=352 #becuase our first PE doesn't have CIs it always estimates a NaN so I just set it back to the point estimate. This is also why you get warnings when you run the loop.
   fit=glm(agg_logCPUE ~ log(pe)+z$meanCPUE)
   betas[i]=fit$coefficients[2]
   comp=abs(fit$aic - aggFit_wLK$aic)
   ps[i]=comp
 }
+plot(betas, ps)
+hist(betas, main = "walleye betas")
+hist(ps)
 
-betas=numeric(1000) #betas from model fit to simulated data
-ps=numeric(1000) #difference in AIC values between the simulated data model fit and the experimental data model fit
 
