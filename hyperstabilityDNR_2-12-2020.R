@@ -206,7 +206,7 @@ panJoin<- panJoin[panJoin$logCPUE!=-Inf,]
 
 #making upper and lower confidence intervals using std and the mean to helep with measuring betas
 bassJoin$PE.ucl=bassJoin$std+bassJoin$meanCPUE
-bassJoin$PE.lcll=bassJoin$std-bassJoin$meanCPUE
+bassJoin$PE.lcl=bassJoin$std-bassJoin$meanCPUE
 
 wallJoin$PE.ucl=wallJoin$std+wallJoin$meanCPUE
 wallJoin$PE.lcl=wallJoin$std-wallJoin$meanCPUE
@@ -214,10 +214,22 @@ wallJoin$PE.lcl=wallJoin$std-wallJoin$meanCPUE
 panJoin$PE.ucl=panJoin$std+panJoin$meanCPUE
 panJoin$PE.lcl=panJoin$std-panJoin$meanCPUE
 
+#join tables to compare species with lm model
+LMBplusWall=rbind(bassJoin[bassJoin$species=="LARGEMOUTH BASS",],wallJoin)
+#generate linear model to compare hyperstability of 
+LMBvsWall<-lm(LMBplusWall$logCPUE~LMBplusWall$logAbun*LMBplusWall$species)
+summary(LMBvsWall)
+#Walleye statistically significant different from LMB hyperstability similar lines on fit
+
 
 #general linear model for bass, using glm function 
 fit1<-glm(bassJoin$logCPUE~bassJoin$logAbun)
 summary(fit1)
+
+LMBvsSMB<-lm(bassJoin$logCPUE~bassJoin$logAbun*bassJoin$species)
+summary(LMBvsSMB)
+#both are hyperstable but largemouth bass are more hyperstable 
+
 
 #ploting model with fit line bass log transformed abund. and CPUE
 plot(x=bassJoin$logAbun,y=bassJoin$logCPUE)
@@ -261,11 +273,9 @@ plot(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE)
 plot(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2])
 
 ### Ploting hyperstability ###
-plot(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE)
-lines(1:65,exp(fit1$coefficients[1])*(1:65)^fit1$coefficients[2])
-lines(0:160,exp(fit2$coefficients[1])*(0:160)^fit2$coefficients[2])
-lines(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2])
-
+plot(x=1:165,y=exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2], col='blue', type = "l",ylim = c(0,5))
+lines(1:165,exp(fit1$coefficients[1])*(1:165)^fit1$coefficients[2],col="red")
+lines(1:165,exp(fit2$coefficients[1])*(1:165)^fit2$coefficients[2],col="darkgreen")
 
 
 #using betaBootstrapping R script to calucate betas from model fit to simulated data
@@ -298,4 +308,11 @@ plot(betas, ps)
 hist(betas, main = "walleye betas")
 hist(ps)
 
+#pullin in CWH info/linfo join with WBIC, keep all rows and fill in NA where its missing, dpplyr left join (bass,wood)
+#shoreline development numbers for lakes, GIS dane and alex ross
+#literature review for building density vilas co., anna marburg
+#try model with dummy variable to compare species to each other fit
+
+#lm(loganCPUE~logefCPUE*species), efCPUE + species + efCPUE:species
+#B0 + b1efCPUE + B2*species +B3efCPUE scpeies
 
