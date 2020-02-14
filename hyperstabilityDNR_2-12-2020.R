@@ -221,6 +221,10 @@ LMBvsWall<-lm(LMBplusWall$logCPUE~LMBplusWall$logAbun*LMBplusWall$species)
 summary(LMBvsWall)
 #Walleye statistically significant different from LMB hyperstability similar lines on fit
 
+#plotting bass fit and LMBvsSMB fits
+plot(x=bassJoin$logAbun,y=bassJoin$logCPUE)
+abline(LMBvsSMB, col="red")
+abline(fit1, col="blue")
 
 #general linear model for bass, using glm function 
 fit1<-glm(bassJoin$logCPUE~bassJoin$logAbun)
