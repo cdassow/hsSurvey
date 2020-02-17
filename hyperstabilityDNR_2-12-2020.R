@@ -331,6 +331,9 @@ bassbuildJoin=bassbuildJoin[!is.na(bassbuildJoin$buildingCount50m),]
 #bringing in coarse woody habitat estimates from Jake Ziegler data from YOY mort. study
 CWHdensity=gdriveURL("https://drive.google.com/open?id=1x1_JdeamiU2auqrlPQ3G_wA6Spuf0vwf")
 #only 61 observations*
+bassCWHJoin=left_join(bassJoin,CWHdensity,by="WBIC")
+bassCWHJoin=bassCWHJoin[!is.na(bassCWHJoin$Total.CWH.per.km.shoreline),]
+#not all shoreline data points have wood data, still only 23 observations
 
 bassbuildCWHJoin=left_join(bassbuildJoin,CWHdensity,by="WBIC")
 bassbuildCWHJoin=bassbuildCWHJoin[!is.na(bassbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
