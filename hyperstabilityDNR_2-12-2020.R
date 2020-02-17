@@ -320,3 +320,20 @@ hist(ps)
 #lm(loganCPUE~logefCPUE*species), efCPUE + species + efCPUE:species
 #B0 + b1efCPUE + B2*species +B3efCPUE scpeies
 
+#bringing in buildling density data
+buildDensity2018=gdriveURL("https://drive.google.com/open?id=11lPPduqiXIxz00fm6xxFzUA8u9nCOBnN")
+
+#joining building density to bass catch + abund info
+bassbuildJoin=left_join(bassJoin,buildDensity2018,by="WBIC")
+bassbuildJoin=bassbuildJoin[!is.na(bassbuildJoin$buildingCount50m),]
+#only 28 unique ones, 94 entries with wbics that have lake density estimates (about 25%)
+
+#bringing in coarse woody habitat estimates from Jake Ziegler data from YOY mort. study
+CWHdensity=gdriveURL("https://drive.google.com/open?id=1x1_JdeamiU2auqrlPQ3G_wA6Spuf0vwf")
+#only 61 observations*
+
+bassbuildCWHJoin=left_join(bassbuildJoin,CWHdensity,by="WBIC")
+bassbuildCWHJoin=bassbuildCWHJoin[!is.na(bassbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
+#trimming table for values with measurements for CWH info and building density, only 23 obs
+
+
