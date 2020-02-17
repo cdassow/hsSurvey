@@ -328,12 +328,35 @@ bassbuildJoin=left_join(bassJoin,buildDensity2018,by="WBIC")
 bassbuildJoin=bassbuildJoin[!is.na(bassbuildJoin$buildingCount50m),]
 #only 28 unique ones, 94 entries with wbics that have lake density estimates (about 25%)
 
+#building density numbers for walleye lake yr observations
+wallbuildJoin=left_join(wallJoin,buildDensity2018,by="WBIC")
+wallbuildJoin=wallbuildJoin[!is.na(wallbuildJoin$buildingCount50m),]
+#104 observations with walleye info + building density
+
+#builing density numbers for panfish lake yr observations
+panbuildJoin=left_join(panJoin,buildDensity2018,by="WBIC")
+panbuildJoin=panbuildJoin[!is.na(panbuildJoin$buildingCount50m),]
+#44 observations
+
 #bringing in coarse woody habitat estimates from Jake Ziegler data from YOY mort. study
 CWHdensity=gdriveURL("https://drive.google.com/open?id=1x1_JdeamiU2auqrlPQ3G_wA6Spuf0vwf")
 #only 61 observations*
+
+#seeing how many lake yr for a species have supplemental CWH denisty info
+
 bassCWHJoin=left_join(bassJoin,CWHdensity,by="WBIC")
 bassCWHJoin=bassCWHJoin[!is.na(bassCWHJoin$Total.CWH.per.km.shoreline),]
 #not all shoreline data points have wood data, still only 23 observations
+
+wallCWHJoin=left_join(wallJoin,CWHdensity,by="WBIC")
+wallCWHJoin=wallCWHJoin[!is.na(wallCWHJoin$Total.CWH.per.km.shoreline),]
+#only 27 observations for wall lakes with CWH density info
+
+panCWHJoin=left_join(panJoin,CWHdensity,by="WBIC")
+panCWHJoin=panCWHJoin[!is.na(panCWHJoin$Total.CWH.per.km.shoreline),]
+#only 12 big yikes
+
+#checking which lakes have CWH and buidling density info for a given species
 
 bassbuildCWHJoin=left_join(bassbuildJoin,CWHdensity,by="WBIC")
 bassbuildCWHJoin=bassbuildCWHJoin[!is.na(bassbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
@@ -342,4 +365,9 @@ bassbuildCWHJoin=bassbuildCWHJoin[!is.na(bassbuildCWHJoin$CWH.greater.than.10cm.
 #some cwh data avaliable online for yrs 2001-2004, unable to see yr/date of obs,
 #https://lter.limnology.wisc.edu/dataset/biocomplexity-north-temperate-lakes-lter-coordinated-field-studies-riparian-plots-2001-2004
 #probably will stick with fishscapes buildin density + CWH data
+
+CwhNTL<-read.csv("CwhNTL2001-2004.csv")
+#no wbics, will come back to it 
+#will need to focus on lakeshore development data over CWH
+
 
