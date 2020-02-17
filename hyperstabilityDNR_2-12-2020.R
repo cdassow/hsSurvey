@@ -336,4 +336,7 @@ bassbuildCWHJoin=left_join(bassbuildJoin,CWHdensity,by="WBIC")
 bassbuildCWHJoin=bassbuildCWHJoin[!is.na(bassbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
 #trimming table for values with measurements for CWH info and building density, only 23 obs
 
+#some cwh data avaliable online for yrs 2001-2004, unable to see yr/date of obs,
+#https://lter.limnology.wisc.edu/dataset/biocomplexity-north-temperate-lakes-lter-coordinated-field-studies-riparian-plots-2001-2004
+#probably will stick with fishscapes buildin density + CWH data
 
