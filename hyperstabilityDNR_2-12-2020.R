@@ -215,11 +215,20 @@ panJoin$PE.ucl=panJoin$std+panJoin$meanCPUE
 panJoin$PE.lcl=panJoin$std-panJoin$meanCPUE
 
 #join tables to compare species with lm model
+LMBvsSMB<-lm(bassJoin$logCPUE~bassJoin$logAbun*bassJoin$species)
+summary(LMBvsSMB)
+#both are hyperstable but largemouth bass are more hyperstable 
+
 LMBplusWall=rbind(bassJoin[bassJoin$species=="LARGEMOUTH BASS",],wallJoin)
 #generate linear model to compare hyperstability of 
 LMBvsWall<-lm(LMBplusWall$logCPUE~LMBplusWall$logAbun*LMBplusWall$species)
 summary(LMBvsWall)
 #Walleye statistically significant different from LMB hyperstability similar lines on fit
+
+LMBplusPan=rbind(bassJoin[bassJoin$species=="LARGEMOUTH BASS",],panJoin)
+LMBvsPan<-lm(LMBplusPan$logCPUE~LMBplusPan$logAbun*LMBplusPan$species)
+summary(LMBvsPan)
+#difference in hyperstability among panfish species and lmb
 
 #plotting bass fit and LMBvsSMB fits
 plot(x=bassJoin$logAbun,y=bassJoin$logCPUE)
@@ -229,11 +238,6 @@ abline(fit1, col="blue")
 #general linear model for bass, using glm function 
 fit1<-glm(bassJoin$logCPUE~bassJoin$logAbun)
 summary(fit1)
-
-LMBvsSMB<-lm(bassJoin$logCPUE~bassJoin$logAbun*bassJoin$species)
-summary(LMBvsSMB)
-#both are hyperstable but largemouth bass are more hyperstable 
-
 
 #ploting model with fit line bass log transformed abund. and CPUE
 plot(x=bassJoin$logAbun,y=bassJoin$logCPUE)
@@ -312,13 +316,14 @@ plot(betas, ps)
 hist(betas, main = "walleye betas")
 hist(ps)
 
-#pullin in CWH info/linfo join with WBIC, keep all rows and fill in NA where its missing, dpplyr left join (bass,wood)
-#shoreline development numbers for lakes, GIS dane and alex ross
+#pulling in CWH info/linfo join with WBIC, keep all rows and fill in NA where its missing, dpplyr left join (bass,wood)
 #literature review for building density vilas co., anna marburg
 #try model with dummy variable to compare species to each other fit
 
 #lm(loganCPUE~logefCPUE*species), efCPUE + species + efCPUE:species
 #B0 + b1efCPUE + B2*species +B3efCPUE scpeies
+
+####  models with building densities ####
 
 #bringing in buildling density data
 buildDensity2018=gdriveURL("https://drive.google.com/open?id=11lPPduqiXIxz00fm6xxFzUA8u9nCOBnN")
@@ -337,6 +342,21 @@ wallbuildJoin=wallbuildJoin[!is.na(wallbuildJoin$buildingCount50m),]
 panbuildJoin=left_join(panJoin,buildDensity2018,by="WBIC")
 panbuildJoin=panbuildJoin[!is.na(panbuildJoin$buildingCount50m),]
 #44 observations
+
+#model fits
+
+fit4<-glm(bassbuildJoin$meanCPUE~bassbuildJoin$meanEF_CPEkm+bassbuildJoin$buildingDensity200m)
+summary(fit4)
+
+fit5<-glm(panbuildJoin$meanCPUE~panbuildJoin$meanEF_CPEkm+panbuildJoin$buildingDensity200m)
+summary(fit5)
+#almost significant
+
+fit6<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun+wallbuildJoin$buildingDensity200m)
+summary(fit6)
+#only statistically significant result with walleye data, note this may due to wallbuild having most obs.
+
+#### Models with CWH density ####
 
 #bringing in coarse woody habitat estimates from Jake Ziegler data from YOY mort. study
 CWHdensity=gdriveURL("https://drive.google.com/open?id=1x1_JdeamiU2auqrlPQ3G_wA6Spuf0vwf")
@@ -361,6 +381,18 @@ panCWHJoin=panCWHJoin[!is.na(panCWHJoin$Total.CWH.per.km.shoreline),]
 bassbuildCWHJoin=left_join(bassbuildJoin,CWHdensity,by="WBIC")
 bassbuildCWHJoin=bassbuildCWHJoin[!is.na(bassbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
 #trimming table for values with measurements for CWH info and building density, only 23 obs
+
+#model fits
+
+fit7<-glm(bassbuildCWHJoin$meanCPUE~bassbuildCWHJoin$meanEF_CPEkm+bassbuildCWHJoin$Total.CWH.per.km.shoreline)
+summary(fit7)
+
+fit8<-glm(panCWHJoin$meanCPUE~panCWHJoin$meanEF_CPEkm+panCWHJoin$Total.CWH.per.km.shoreline)
+summary(fit8)
+
+fit9<-glm(wallCWHJoin$meanCPUE~wallCWHJoin$meanEF_CPEkm+wallCWHJoin$Total.CWH.per.km.shoreline)
+summary(fit9)
+#not significant, small obs. number for all 
 
 #some cwh data avaliable online for yrs 2001-2004, unable to see yr/date of obs,
 #https://lter.limnology.wisc.edu/dataset/biocomplexity-north-temperate-lakes-lter-coordinated-field-studies-riparian-plots-2001-2004
