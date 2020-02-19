@@ -204,7 +204,7 @@ panJoin$logAbun=log(panJoin$meanEF_CPEkm)
 panJoin<- panJoin[panJoin$logCPUE!=-Inf,]
 
 
-#making upper and lower confidence intervals using std and the mean to helep with measuring betas
+#making upper and lower confidence intervals using std and the mean to help with measuring betas
 bassJoin$PE.ucl=bassJoin$std+bassJoin$meanCPUE
 bassJoin$PE.lcl=bassJoin$std-bassJoin$meanCPUE
 
