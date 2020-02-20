@@ -193,6 +193,8 @@ bassJoin$logCPUE=log(bassJoin$meanCPUE)
 bassJoin$logAbun=log(bassJoin$meanEF_CPEkm)
 bassJoin<- bassJoin[is.na(bassJoin$logCPUE)==F,]
 bassJoin<- bassJoin[bassJoin$logCPUE!=-Inf,]
+bassJoin<- bassJoin[is.na(bassJoin$logAbun)==F,]
+bassJoin<- bassJoin[bassJoin$logAbun!=-Inf,]
 
 wallJoin$logCPUE=log(wallJoin$meanCPUE)
 wallJoin$logAbun=log(wallJoin$meanEF_CPEkm)
@@ -228,7 +230,7 @@ summary(LMBvsWall)
 LMBplusPan=rbind(bassJoin[bassJoin$species=="LARGEMOUTH BASS",],panJoin)
 LMBvsPan<-lm(LMBplusPan$logCPUE~LMBplusPan$logAbun*LMBplusPan$species)
 summary(LMBvsPan)
-#difference in hyperstability among panfish species and lmb
+#difference in hyperstability among panfish species and lmb, maybe check combinations
 
 #plotting bass fit and LMBvsSMB fits
 plot(x=bassJoin$logAbun,y=bassJoin$logCPUE)
@@ -347,16 +349,24 @@ panbuildJoin=panbuildJoin[!is.na(panbuildJoin$buildingCount50m),]
 
 #model fits
 
-fit4<-glm(bassbuildJoin$meanCPUE~bassbuildJoin$meanEF_CPEkm+bassbuildJoin$buildingDensity200m)
+fit4<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$buildingDensity200m:bassbuildJoin$logAbun)
 summary(fit4)
 
-fit5<-glm(panbuildJoin$meanCPUE~panbuildJoin$meanEF_CPEkm+panbuildJoin$buildingDensity200m)
-summary(fit5)
-#almost significant
+#looking at residuals as a function of building density,look at relationship between beta and density
+VilasBassFit<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun)
+plot(bassbuildJoin$buildingDensity200m,residuals(VilasBassFit))
+residuals(VilasBassFit)
 
-fit6<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun+wallbuildJoin$buildingDensity200m)
+
+fit5<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun:panbuildJoin$buildingDensity200m)
+summary(fit5)
+VilasPanFit<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun)
+plot(panbuildJoin$buildingDensity200m,residuals(VilasPanFit))
+
+fit6<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun:wallbuildJoin$buildingDensity200m)
 summary(fit6)
-#only statistically significant result with walleye data, note this may due to wallbuild having most obs.
+VilasWallFit<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun)
+plot(wallbuildJoin$buildingDensity200m,residuals(VilasWallFit))
 
 #### Models with CWH density ####
 
@@ -384,7 +394,7 @@ bassbuildCWHJoin=left_join(bassbuildJoin,CWHdensity,by="WBIC")
 bassbuildCWHJoin=bassbuildCWHJoin[!is.na(bassbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
 #trimming table for values with measurements for CWH info and building density, only 23 obs
 
-#model fits
+#model fits, fix to plots with residuals and CWH interactions
 
 fit7<-glm(bassbuildCWHJoin$meanCPUE~bassbuildCWHJoin$meanEF_CPEkm+bassbuildCWHJoin$Total.CWH.per.km.shoreline)
 summary(fit7)
