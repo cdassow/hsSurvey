@@ -281,9 +281,11 @@ plot(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE)
 plot(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2])
 
 ### Ploting hyperstability ###
-plot(x=1:165,y=exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2], col='blue', type = "l",ylim = c(0,5))
-lines(1:165,exp(fit1$coefficients[1])*(1:165)^fit1$coefficients[2],col="red")
-lines(1:165,exp(fit2$coefficients[1])*(1:165)^fit2$coefficients[2],col="darkgreen")
+plot(x=1:165,y=exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2], col='darkgreen', type = "l",ylim = c(0,5),
+     main = "model fits for hyperstability")
+lines(1:165,exp(fit1$coefficients[1])*(1:165)^fit1$coefficients[2],col="blue")
+lines(1:165,exp(fit2$coefficients[1])*(1:165)^fit2$coefficients[2],col="red")
+legend("topright",paste("Fit = ",1:3), lty = 1:5, col = 1:5)
 
 
 #using betaBootstrapping R script to calucate betas from model fit to simulated data
