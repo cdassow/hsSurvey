@@ -239,7 +239,7 @@ abline(fit1, col="blue")
 
 #general linear model for bass, using glm function 
 fit1<-glm(bassJoin$logCPUE~bassJoin$logAbun)
-summary(fit1)
+summary(fit1)#p value
 
 #ploting model with fit line bass log transformed abund. and CPUE
 plot(x=bassJoin$logAbun,y=bassJoin$logCPUE)
@@ -257,7 +257,7 @@ ggplot(fit1,aes(bassJoin$meanEF_CPEkm,bassJoin$meanCPUE))+geom_smooth(model=lm)
 
 #model for panfish, fit summary estimate 0.23189 
 fit2<-glm(panJoin$logCPUE~panJoin$logAbun)
-summary(fit2)
+summary(fit2)#p value
 
 #ploting model with fit line log trans. for panfish
 plot(x=panJoin$logAbun,y=panJoin$logCPUE)
@@ -271,7 +271,7 @@ plot(0:160,exp(fit2$coefficients[1])*(0:160)^fit2$coefficients[2])
 
 # glmodel for walleye, fit summary estimate 0.63073
 fit3<-glm(wallJoin$logCPUE~wallJoin$logAbun)
-summary(fit3)
+summary(fit3)#p value
 
 #ploting model with fit line bass log transformed abund. and CPUE
 plot(x=wallJoin$logAbun,y=wallJoin$logCPUE)
@@ -295,7 +295,7 @@ legend("topright",paste("Fit = ",1:3), lty = 1:5, col = 1:5)
 ### Bootstrapping ####
 
 #make d the dataframe you want, using bass as example
-d=panJoin
+d=bassJoin
 z=d[!duplicated(d$meanEF_CPEkm),]
 agg_logCPUE=log(z$meanCPUE)
 #wallJoin and panJoin agg_logCPUE has Inf value, needs to be removed for glm fit 
@@ -317,7 +317,7 @@ for(i in 1:1000){
   ps[i]=comp
 }
 plot(betas, ps)
-hist(betas, main = "walleye betas")
+hist(betas, main = "bass betas")
 hist(ps)
 
 #pulling in CWH info/linfo join with WBIC, keep all rows and fill in NA where its missing, dpplyr left join (bass,wood)
@@ -359,12 +359,12 @@ residuals(VilasBassFit)
 
 
 fit5<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun:panbuildJoin$buildingDensity200m)
-summary(fit5)
+summary(fit5)#look at p value
 VilasPanFit<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun)
 plot(panbuildJoin$buildingDensity200m,residuals(VilasPanFit))
 
 fit6<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun:wallbuildJoin$buildingDensity200m)
-summary(fit6)
+summary(fit6)#look at p value
 VilasWallFit<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun)
 plot(wallbuildJoin$buildingDensity200m,residuals(VilasWallFit))
 
@@ -393,17 +393,30 @@ panCWHJoin=panCWHJoin[!is.na(panCWHJoin$Total.CWH.per.km.shoreline),]
 bassbuildCWHJoin=left_join(bassbuildJoin,CWHdensity,by="WBIC")
 bassbuildCWHJoin=bassbuildCWHJoin[!is.na(bassbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
 #trimming table for values with measurements for CWH info and building density, only 23 obs
+panbuildCWHJoin=left_join(panbuildJoin,CWHdensity,by="WBIC")
+panbuildCWHJoin=panbuildCWHJoin[!is.na(panbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
+
+wallbuildCWHJoin=left_join(wallbuildJoin,CWHdensity,by="WBIC")
+wallbuildCWHJoin=wallbuildCWHJoin[!is.na(wallbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
 
 #model fits, fix to plots with residuals and CWH interactions
 
-fit7<-glm(bassbuildCWHJoin$meanCPUE~bassbuildCWHJoin$meanEF_CPEkm+bassbuildCWHJoin$Total.CWH.per.km.shoreline)
-summary(fit7)
+fit7<-glm(bassbuildCWHJoin$logCPUE~bassbuildCWHJoin$logAbun:bassbuildCWHJoin$Total.CWH.per.km.shoreline)
+summary(fit7)#look at pvalue
+CWHBassFit<-glm(bassbuildCWHJoin$logCPUE~bassbuildCWHJoin$logAbun)
+plot(bassbuildCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHBassFit))
 
-fit8<-glm(panCWHJoin$meanCPUE~panCWHJoin$meanEF_CPEkm+panCWHJoin$Total.CWH.per.km.shoreline)
+fit8<-glm(panCWHJoin$logCPUE~panCWHJoin$logAbun:panCWHJoin$Total.CWH.per.km.shoreline)
 summary(fit8)
+CWHPanFit<-glm(panbuildCWHJoin$logCPUE~panbuildCWHJoin$logAbun)
+plot(panbuildCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHPanFit))
 
-fit9<-glm(wallCWHJoin$meanCPUE~wallCWHJoin$meanEF_CPEkm+wallCWHJoin$Total.CWH.per.km.shoreline)
+
+fit9<-glm(wallCWHJoin$logCPUE~wallCWHJoin$logAbun:wallCWHJoin$Total.CWH.per.km.shoreline)
 summary(fit9)
+CWHWallFit<-glm(wallbuildCWHJoin$logCPUE~wallbuildCWHJoin$logAbun)
+plot(wallbuildCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHWallFit))
+
 #not significant, small obs. number for all 
 
 #some cwh data avaliable online for yrs 2001-2004, unable to see yr/date of obs,
