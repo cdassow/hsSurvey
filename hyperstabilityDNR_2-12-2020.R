@@ -286,7 +286,7 @@ plot(x=1:165,y=exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2], col='dark
 lines(1:165,exp(fit1$coefficients[1])*(1:165)^fit1$coefficients[2],col="blue")
 lines(1:165,exp(fit2$coefficients[1])*(1:165)^fit2$coefficients[2],col="red")
 legend("topright",paste("Fit = ",1:3), lty = 1:5, col = 1:5)
-
+#levels of CPUE index
 
 #using betaBootstrapping R script to calucate betas from model fit to simulated data
 
