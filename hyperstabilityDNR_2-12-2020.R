@@ -232,6 +232,11 @@ LMBvsPan<-lm(LMBplusPan$logCPUE~LMBplusPan$logAbun*LMBplusPan$species)
 summary(LMBvsPan)
 #difference in hyperstability among panfish species and lmb, maybe check combinations
 
+#bass vs blugegill hyperstability model fit
+LMBplusBLG=rbind(bassJoin[bassJoin$species=="LARGEMOUTH BASS",],panJoin[panJoin$species=="BLUEGILL",])
+LMBvsBLG<-lm(LMBplusBLG$logCPUE~LMBplusBLG$logAbun*LMBplusBLG$species)
+summary(LMBvsBLG)
+
 #plotting bass fit and LMBvsSMB fits
 plot(x=bassJoin$logAbun,y=bassJoin$logCPUE)
 abline(LMBvsSMB, col="red")
