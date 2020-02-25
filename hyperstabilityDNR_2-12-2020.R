@@ -264,6 +264,11 @@ ggplot(fit1,aes(bassJoin$meanEF_CPEkm,bassJoin$meanCPUE))+geom_smooth(model=lm)
 fit2<-glm(panJoin$logCPUE~panJoin$logAbun)
 summary(fit2)#p value
 
+#determining model fit, to check hyperstability for bluegill
+BLGJoin=panJoin[panJoin$species=="BLUEGILL",]
+BLGfit<-glm(BLGJoin$logCPUE~BLGJoin$logAbun)
+summary(BLGfit)
+
 #ploting model with fit line log trans. for panfish
 plot(x=panJoin$logAbun,y=panJoin$logCPUE)
 abline(fit2)
