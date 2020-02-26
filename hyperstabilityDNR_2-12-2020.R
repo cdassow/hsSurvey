@@ -17,7 +17,7 @@ creel2=gdriveURL("https://drive.google.com/open?id=1UYhbGH28WXjmi-4BzhfwO4KYwrBC
 creel=rbind(creel1,creel2)
 
 # reduce to columns we care about
-creel=creel[,c(3,6,12,18,25:26,30,36,38)]
+creel=creel[,c(1,3,6,12,18,25:26,30,36,38)]
 
 # calculate effort
 # add zeroes to times with only 2 or 3 digits
@@ -65,7 +65,7 @@ creel=creel[creel$anglingCPUE<30,]
 
 # calculate average angling CPUE and sample size for each lake-year-species combination
 lake_yearCPUE=creel %>%
-              group_by(WBIC,fishSpeciesCode,surveyYear) %>%
+              group_by(WBIC,fishSpeciesCode,surveyYear,county) %>%
               summarize(meanCPUE=mean(anglingCPUE),
                         N=n())
 lake_yearCPUE=as.data.frame(lake_yearCPUE)
@@ -74,11 +74,11 @@ lake_yearCPUE=as.data.frame(lake_yearCPUE)
 
 ####### electrofishing abundance
 bassEF=gdriveURL("https://drive.google.com/open?id=11v8FbT2wnKx_CqUfxu_V9r_8fyCfcdD2")
-bassEF=bassEF[,c(3,5,13,19,27:29)]
+bassEF=bassEF[,c(1,3,5,13,19,27:29)]
 bassEF$CPEkm=bassEF$CPEmile/1.60934   # convert fish per mile to fish per km
 bassEF$distanceShockedKm=bassEF$distanceShockedMiles*0.621371 # convert miles to km
 lake_yearBASSef= bassEF %>%
-  group_by(WBIC,species,surveyYear) %>%
+  group_by(WBIC,species,surveyYear,county) %>%
   summarize(meanEF_CPEkm=mean(CPEkm),
             totalFishCaught=sum(totalNumberCaughtFish),
             totalDistShockedKm=sum(distanceShockedKm),
@@ -89,11 +89,11 @@ lake_yearBASSef=as.data.frame(lake_yearBASSef)
 
 
 panEF=gdriveURL("https://drive.google.com/open?id=1QIqCBQ9gbOgRFUJQbnokwwTZJi5VZZIR")
-panEF=panEF[,c(3,5,13,19,25:27)]
+panEF=panEF[,c(1,3,5,13,19,25:27)]
 panEF$CPEkm=panEF$CPEmile/1.60934   # convert fish per mile to fish per km
 panEF$distanceShockedKm=panEF$distanceShockedMiles*0.621371 # convert miles to km
 lake_yearPANef= panEF %>%
-  group_by(WBIC,species,surveyYear) %>%
+  group_by(WBIC,species,surveyYear,county) %>%
   summarize(meanEF_CPEkm=mean(CPEkm),
             totalFishCaught=sum(totalNumberCaughtFish),
             totalDistShockedKm=sum(distanceShockedKm),
@@ -103,13 +103,13 @@ lake_yearPANef= panEF %>%
 lake_yearPANef=as.data.frame(lake_yearPANef)
 
 walleyeEF=gdriveURL("https://drive.google.com/open?id=1DPRROWv6Cf_fP6Z-kE9ZgUfdf_F_jSNT")
-walleyeEF=walleyeEF[,c(3,5,13,19,23:24,27)]
+walleyeEF=walleyeEF[,c(1,3,5,13,19,23:24,27)]
 walleyeEF$CPEkm=walleyeEF$CPEmile/1.60934   # convert fish per mile to fish per km
 walleyeEF$distanceShockedKm=walleyeEF$distanceShockedMiles*0.621371 # convert miles to km
 #remove commas from total fish caught
 walleyeEF$totalNumberCaughtFish=as.numeric(gsub(",","",walleyeEF$totalNumberCaughtFish))
 lake_yearWALLef= walleyeEF %>%
-  group_by(WBIC,species,surveyYear) %>%
+  group_by(WBIC,species,surveyYear,county) %>%
   summarize(meanEF_CPEkm=mean(CPEkm),
             totalFishCaught=sum(totalNumberCaughtFish),
             totalDistShockedKm=sum(distanceShockedKm),
@@ -132,14 +132,14 @@ lake_yearCPUE$species[lake_yearCPUE$fishSpeciesCode=="W09"]="BLUEGILL"
 # trim species without EF data (can we get other species EF data?)
 lake_yearCPUE=lake_yearCPUE[lake_yearCPUE$species!="",]
 
-bassJoin=left_join(lake_yearBASSef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear"))
+bassJoin=left_join(lake_yearBASSef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear","county"="county"))
 bassJoin=bassJoin[!is.na(bassJoin$meanCPUE),]
 
-panJoin=left_join(lake_yearPANef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear"))
+panJoin=left_join(lake_yearPANef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear","county"="county"))
 panJoin=panJoin[!is.na(panJoin$meanCPUE),]
 
 
-wallJoin=left_join(lake_yearWALLef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear"))
+wallJoin=left_join(lake_yearWALLef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear","county"="county"))
 wallJoin=wallJoin[!is.na(wallJoin$meanCPUE),]
 
 table(lake_yearCPUE$species)
@@ -290,14 +290,15 @@ abline(fit3)
 #normal spcae plot of model fit to the data, exponential(intercept)*x^slope this is qN^B
 #coefficients 2 is beta
 plot(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE)
-plot(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2])
+plot(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2],
+     main="Hyperstability of Walleye",ylab = "angling CPUE",xlab = "ef CPUE")
 
 ### Ploting hyperstability ###
 plot(x=1:165,y=exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2], col='darkgreen', type = "l",ylim = c(0,5),
-     main = "model fits for hyperstability")
+     main = "model fits for hyperstability", xlab="effort", ylab = "catch")
 lines(1:165,exp(fit1$coefficients[1])*(1:165)^fit1$coefficients[2],col="blue")
 lines(1:165,exp(fit2$coefficients[1])*(1:165)^fit2$coefficients[2],col="red")
-legend("topright",paste("Fit = ",1:3), lty = 1:5, col = 1:5)
+legend("topright",paste("Fit = ",c("LMB","Panfish","Walleye")), lty = 1:5, col = 1:5)
 #levels of CPUE index
 
 #using betaBootstrapping R script to calucate betas from model fit to simulated data
@@ -359,24 +360,25 @@ panbuildJoin=panbuildJoin[!is.na(panbuildJoin$buildingCount50m),]
 
 #model fits
 
-fit4<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$buildingDensity200m:bassbuildJoin$logAbun)
-summary(fit4)
+fit4<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildingDensity200m)
+summary(fit4)#nothing significant 
 
 #looking at residuals as a function of building density,look at relationship between beta and density
-VilasBassFit<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun)
+VilasBassFit<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildingCount200m)
 plot(bassbuildJoin$buildingDensity200m,residuals(VilasBassFit))
 residuals(VilasBassFit)
 
 
-fit5<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun:panbuildJoin$buildingDensity200m)
+fit5<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun+panbuildJoin$logAbun:panbuildJoin$buildingDensity200m)
 summary(fit5)#look at p value
 VilasPanFit<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun)
 plot(panbuildJoin$buildingDensity200m,residuals(VilasPanFit))
 
-fit6<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun:wallbuildJoin$buildingDensity200m)
+fit6<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun+wallbuildJoin$logAbun:wallbuildJoin$buildingDensity200m)
 summary(fit6)#look at p value
 VilasWallFit<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun)
-plot(wallbuildJoin$buildingDensity200m,residuals(VilasWallFit))
+plot(wallbuildJoin$buildingDensity200m,residuals(VilasWallFit), 
+     main="relationship between walleye betas and building density", ylab="Residuals")
 
 #### Models with CWH density ####
 
@@ -411,23 +413,25 @@ wallbuildCWHJoin=wallbuildCWHJoin[!is.na(wallbuildCWHJoin$CWH.greater.than.10cm.
 
 #model fits, fix to plots with residuals and CWH interactions
 
-fit7<-glm(bassbuildCWHJoin$logCPUE~bassbuildCWHJoin$logAbun:bassbuildCWHJoin$Total.CWH.per.km.shoreline)
-summary(fit7)#look at pvalue
+fit7<-glm(bassbuildCWHJoin$logCPUE~bassbuildCWHJoin$logAbun+bassbuildCWHJoin$logAbun:bassbuildCWHJoin$Total.CWH.per.km.shoreline)
+summary(fit7)#not significant
 CWHBassFit<-glm(bassbuildCWHJoin$logCPUE~bassbuildCWHJoin$logAbun)
 plot(bassbuildCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHBassFit))
 
-fit8<-glm(panCWHJoin$logCPUE~panCWHJoin$logAbun:panCWHJoin$Total.CWH.per.km.shoreline)
-summary(fit8)
-CWHPanFit<-glm(panbuildCWHJoin$logCPUE~panbuildCWHJoin$logAbun)
-plot(panbuildCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHPanFit))
+fit8<-glm(panCWHJoin$logCPUE~panCWHJoin$logAbun+panCWHJoin$logAbun:panCWHJoin$Total.CWH.per.km.shoreline)
+summary(fit8)#not significant
+CWHPanFit<-glm(panCWHJoin$logCPUE~panCWHJoin$logAbun)
+plot(panCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHPanFit))
 
 
-fit9<-glm(wallCWHJoin$logCPUE~wallCWHJoin$logAbun:wallCWHJoin$Total.CWH.per.km.shoreline)
-summary(fit9)
+fit9<-glm(wallCWHJoin$logCPUE~wallCWHJoin$logAbun+wallCWHJoin$logAbun:wallCWHJoin$Total.CWH.per.km.shoreline)
+summary(fit9)#not significant 
 CWHWallFit<-glm(wallbuildCWHJoin$logCPUE~wallbuildCWHJoin$logAbun)
 plot(wallbuildCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHWallFit))
 
-#not significant, small obs. number for all 
+
+
+#not significant, small obs. number for all, building density may be better metric
 
 #some cwh data avaliable online for yrs 2001-2004, unable to see yr/date of obs,
 #https://lter.limnology.wisc.edu/dataset/biocomplexity-north-temperate-lakes-lter-coordinated-field-studies-riparian-plots-2001-2004
