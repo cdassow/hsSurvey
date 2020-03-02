@@ -246,6 +246,10 @@ abline(fit1, col="blue")
 fit1<-glm(bassJoin$logCPUE~bassJoin$logAbun)
 summary(fit1)#p value
 
+#looking at relationship with county a few sig codes, need to check equation
+BassCountyfit<-glm(bassJoin$logCPUE~bassJoin$logAbun+bassJoin$logAbun:bassJoin$county)
+summary(BassCountyfit)
+
 #ploting model with fit line bass log transformed abund. and CPUE
 plot(x=bassJoin$logAbun,y=bassJoin$logCPUE)
 abline(fit1)
@@ -286,6 +290,9 @@ summary(fit3)#p value
 #ploting model with fit line bass log transformed abund. and CPUE
 plot(x=wallJoin$logAbun,y=wallJoin$logCPUE)
 abline(fit3)
+
+WallCountyFit<-glm(wallJoin$logCPUE~wallJoin$logAbun+wallJoin$logAbun:wallJoin$county)
+summary(WallCountyFit)#nothing significant about county
 
 #normal spcae plot of model fit to the data, exponential(intercept)*x^slope this is qN^B
 #coefficients 2 is beta
@@ -446,9 +453,13 @@ library(ggplot2)
 table(bassJoin$county)
 plot(table(bassJoin$county),ylab= "# of observations (surveyyr)",xlab="county", type = "h",
      lwd=4,ylim = c(0,60), cex.axis=0.6)
-
+#relationship between hypersta. and county
 CountyBassFit<-glm(bassJoin$logCPUE~bassJoin$logAbun+bassJoin$logAbun:bassJoin$county)
 summary(CountyBassFit)
+
+#relationship between county and effort???
+COeffortBass<-glm(bassJoin$meanEF_CPEkm~bassJoin$county)
+summary(COeffortBass)
 
 CountyWallFit<-glm(wallJoin$logCPUE~wallJoin$logAbun+wallJoin$logAbun:wallJoin$county)
 summary(CountyWallFit)
@@ -482,3 +493,15 @@ BassLclar<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$w
 summary(BassLclar)#no
 
 #will check for walleye
+#lake depth
+WallLDepth<-glm(wallLinfo$logCPUE~wallLinfo$logAbun+wallLinfo$logAbun:wallLinfo$maxDepth)
+summary(WallLDepth)#no
+#lake size
+WallLsize<-glm(wallLinfo$logCPUE~wallLinfo$logAbun+wallLinfo$logAbun:wallLinfo$sizeAcres)
+summary(WallLsize)#no
+#lake type
+WallLtype<-glm(wallLinfo$logCPUE~wallLinfo$logAbun+wallLinfo$logAbun:wallLinfo$lakeType)
+summary(WallLtype)#no
+#water clarity
+WallLclar<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$waterClarity)
+summary(WallLclar)#no
