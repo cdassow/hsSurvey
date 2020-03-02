@@ -441,4 +441,16 @@ CwhNTL<-read.csv("CwhNTL2001-2004.csv")
 #no wbics, will come back to it 
 #will need to focus on lakeshore development data over CWH
 
+#look at the relationship with county
+library(ggplot2)
+table(bassJoin$county)
+plot(table(bassJoin$county),ylab= "# of observations (surveyyr)",xlab="county", type = "h",
+     lwd=4,ylim = c(0,60), cex.axis=0.6)
 
+CountyBassFit<-glm(bassJoin$logCPUE~bassJoin$logAbun+bassJoin$logAbun:bassJoin$county)
+summary(CountyBassFit)
+
+CountyWallFit<-glm(wallJoin$logCPUE~wallJoin$logAbun+wallJoin$logAbun:wallJoin$county)
+summary(CountyWallFit)
+
+#nothing stands out
