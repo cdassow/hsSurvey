@@ -454,3 +454,31 @@ CountyWallFit<-glm(wallJoin$logCPUE~wallJoin$logAbun+wallJoin$logAbun:wallJoin$c
 summary(CountyWallFit)
 
 #nothing stands out
+
+#### Linfo ####
+
+#Relationship between hyperstability (catch vs abundance) and lake characterisitcs
+#bring in lake fishscapes data
+linfo<-gdriveURL("https://drive.google.com/open?id=1ot9rEYnCG07p7aUxbeqN2mJ3cNrzYA0Y")
+linfo=linfo[,1:13]
+#join fish info with lake info using the waterbody codes
+bassLinfo<-left_join(bassJoin,linfo,by="WBIC")
+wallLinfo<-left_join(wallJoin,linfo,by="WBIC")
+panLinfo<-left_join(panJoin,linfo,by="WBIC")
+BLGJoinLinfo<-left_join(BLGJoin,linfo,by="WBIC")
+
+#model fits, testing out bass first
+#lake depth
+BassLDepth<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$maxDepth)
+summary(BassLDepth)#no
+#lake size
+BassLsize<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$sizeAcres)
+summary(BassLsize)#no
+#lake type
+BassLtype<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$lakeType)
+summary(BassLtype)#no
+#water clarity
+BassLclar<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$waterClarity)
+summary(BassLclar)#no
+
+#will check for walleye
