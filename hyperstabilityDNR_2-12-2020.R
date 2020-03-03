@@ -264,6 +264,18 @@ ggplot(bassJoin,aes(bassJoin$meanEF_CPEkm,bassJoin$meanCPUE))+
   geom_point(aes(colour = surveyYear))
 ggplot(fit1,aes(bassJoin$meanEF_CPEkm,bassJoin$meanCPUE))+geom_smooth(model=lm)
 
+#relationship with anglerHrs and bass
+bassEffortfit<-glm(bassJoin$logCPUE~bassJoin$logAbun+bassJoin$logAbun:bassJoin$anglerHrs)
+summary(bassEffortfit)
+
+#relationship with anglerHrs and panfish
+panEffortfit<-glm(panJoin$logCPUE~panJoin$logAbun+panJoin$logAbun:panJoin$anglerHrs)
+summary(panEffortfit)
+
+#relationship with anglerHrs and Walleye
+wallEffortfit<-glm(wallJoin$logCPUE~wallJoin$logAbun+wallJoin$logAbun:wallJoin$anglerHrs)
+summary(wallEffortfit)
+
 #model for panfish, fit summary estimate 0.23189 
 fit2<-glm(panJoin$logCPUE~panJoin$logAbun)
 summary(fit2)#p value
