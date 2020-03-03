@@ -517,3 +517,6 @@ summary(WallLtype)#no
 #water clarity
 WallLclar<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$waterClarity)
 summary(WallLclar)#no
+
+length(unique(bassbuildJoin$WBIC))
+#add in fishscapes lake data and run the same models
