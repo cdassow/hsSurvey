@@ -65,7 +65,7 @@ creel=creel[creel$anglingCPUE<30,]
 
 # calculate average angling CPUE and sample size for each lake-year-species combination
 lake_yearCPUE=creel %>%
-              group_by(WBIC,fishSpeciesCode,surveyYear,county) %>%
+              group_by(WBIC,fishSpeciesCode,surveyYear,anglerHrs,county) %>%
               summarize(meanCPUE=mean(anglingCPUE),
                         N=n())
 lake_yearCPUE=as.data.frame(lake_yearCPUE)
