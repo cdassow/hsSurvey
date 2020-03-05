@@ -520,3 +520,7 @@ summary(WallLclar)#no
 
 length(unique(bassbuildJoin$WBIC))
 #add in fishscapes lake data and run the same models
+
+library(readxl)
+pe2019_CM_3_5_20 <- read_excel("pe2019-CM-3-5-20.xlsx")
+View(pe2019_CM_3_5_20)
