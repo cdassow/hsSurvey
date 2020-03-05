@@ -235,7 +235,7 @@ summary(LMBvsPan)
 #bass vs blugegill hyperstability model fit
 LMBplusBLG=rbind(bassJoin[bassJoin$species=="LARGEMOUTH BASS",],panJoin[panJoin$species=="BLUEGILL",])
 LMBvsBLG<-lm(LMBplusBLG$logCPUE~LMBplusBLG$logAbun*LMBplusBLG$species)
-summary(LMBvsBLG)
+summary(LMBvsBLG)#no
 
 #plotting bass fit and LMBvsSMB fits
 plot(x=bassJoin$logAbun,y=bassJoin$logCPUE)
@@ -265,16 +265,16 @@ ggplot(bassJoin,aes(bassJoin$meanEF_CPEkm,bassJoin$meanCPUE))+
 ggplot(fit1,aes(bassJoin$meanEF_CPEkm,bassJoin$meanCPUE))+geom_smooth(model=lm)
 
 #relationship with anglerHrs and bass
-bassEffortfit<-glm(bassJoin$logCPUE~bassJoin$logAbun+bassJoin$logAbun:bassJoin$anglerHrs)
-summary(bassEffortfit)
+#bassEffortfit<-glm(bassJoin$logCPUE~bassJoin$logAbun+bassJoin$logAbun:bassJoin$anglerHrs)
+#summary(bassEffortfit)#effort not independent
 
 #relationship with anglerHrs and panfish
-panEffortfit<-glm(panJoin$logCPUE~panJoin$logAbun+panJoin$logAbun:panJoin$anglerHrs)
-summary(panEffortfit)
+#panEffortfit<-glm(panJoin$logCPUE~panJoin$logAbun+panJoin$logAbun:panJoin$anglerHrs)
+#summary(panEffortfit)#effort not independent
 
 #relationship with anglerHrs and Walleye
-wallEffortfit<-glm(wallJoin$logCPUE~wallJoin$logAbun+wallJoin$logAbun:wallJoin$anglerHrs)
-summary(wallEffortfit)
+#wallEffortfit<-glm(wallJoin$logCPUE~wallJoin$logAbun+wallJoin$logAbun:wallJoin$anglerHrs)
+#summary(wallEffortfit)#effort not independent
 
 #model for panfish, fit summary estimate 0.23189 
 fit2<-glm(panJoin$logCPUE~panJoin$logAbun)
@@ -522,5 +522,14 @@ length(unique(bassbuildJoin$WBIC))
 #add in fishscapes lake data and run the same models
 
 library(readxl)
-pe2019_CM_3_5_20 <- read_excel("pe2019-CM-3-5-20.xlsx")
-View(pe2019_CM_3_5_20)
+LMB2019 <- read_excel("pe2019-CM-3-5-20.xlsx")
+View(LMB2019)
+#plotting catch vs abundance
+#note: totalCPETime = totalNum/timeEffort, totalCPEDistMI=totalNum/distEffortmi, 
+#totalCPEDistKM=totalNum/distEffortkm
+library(ggplot2)
+ggplot(LMB2019, aes(x=nHat,y=totalCPEDistKM))+geom_point()
+ggplot(LMB2019, aes(x=nHat,y=totalCPETime))+geom_point()
+
+Fishfit<-glm(LMB2019$totalCPEDistKM~LMB2019$nHat)
+summary(Fishfit)
