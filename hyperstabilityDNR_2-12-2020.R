@@ -531,5 +531,7 @@ library(ggplot2)
 ggplot(LMB2019, aes(x=nHat,y=totalCPEDistKM))+geom_point()
 ggplot(LMB2019, aes(x=nHat,y=totalCPETime))+geom_point()
 
-Fishfit<-glm(LMB2019$totalCPEDistKM~LMB2019$nHat)
+Fishfit<-glm(LMB2019$totalCPETime~LMB2019$nHat)
 summary(Fishfit)
+
+LMB2018<-gdriveURL("gv
