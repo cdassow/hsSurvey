@@ -534,4 +534,6 @@ ggplot(LMB2019, aes(x=nHat,y=totalCPETime))+geom_point()
 Fishfit<-glm(LMB2019$totalCPETime~LMB2019$nHat)
 summary(Fishfit)
 
-LMB2018<-gdriveURL("gv
+LMB2018<-gdriveURL("https://drive.google.com/open?id=11YqL34QNdqwg59TdKAXL0t2sYd2yN7GY")
+
+#make survey year column for 2018-19 fish data then join tables
