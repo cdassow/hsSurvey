@@ -537,3 +537,9 @@ summary(Fishfit)
 LMB2018<-gdriveURL("https://drive.google.com/open?id=11YqL34QNdqwg59TdKAXL0t2sYd2yN7GY")
 
 #make survey year column for 2018-19 fish data then join tables
+bassJoin$PE.ucl=bassJoin$std+bassJoin$meanCPUE
+LMB2018$surveyYear=2018
+LMB2019$surveyYear=2019
+
+LMB2019$fishPerKmShoreline=LMB2019$distEffortkm
+LMB=full_join(LMB2018[,2:14],LMB2019[,2:15])
