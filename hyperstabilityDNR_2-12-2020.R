@@ -542,4 +542,4 @@ LMB2018$surveyYear=2018
 LMB2019$surveyYear=2019
 
 LMB2019$fishPerKmShoreline=LMB2019$distEffortkm
-LMB=full_join(LMB2018[,2:14],LMB2019[,2:15])
+LMB=full_join(LMB2018[,2:14],LMB2019[,2:16])
