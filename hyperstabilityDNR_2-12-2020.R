@@ -3,10 +3,12 @@
 # CLM, CJD, SEJ
 
 setwd("~/Documents/Research/Fishscapes/hyperstability/hsSurvey/")
+rm(list=ls())
 
 # load function to load data from google drive
 source("gdriveURL.R")
 library(dplyr)
+
 
 ### Data Wrangle ####
 
@@ -149,6 +151,9 @@ nrow(lake_yearPANef)
 nrow(panJoin)
 nrow(lake_yearWALLef)
 nrow(wallJoin)
+
+table(lake_yearCPUE$surveyYear)
+table(lake_yearBASSef$surveyYear)
 
 library(ggplot2)
 
@@ -541,5 +546,11 @@ bassJoin$PE.ucl=bassJoin$std+bassJoin$meanCPUE
 LMB2018$surveyYear=2018
 LMB2019$surveyYear=2019
 
+#making effort columns with the same names to join columns and datasets
 LMB2019$fishPerKmShoreline=LMB2019$distEffortkm
 LMB=full_join(LMB2018[,2:14],LMB2019[,2:16])
+
+LMBfit<-glm(LMB$distEffortkm~LMB$nHat)
+summary(LMBfit)
+
+
