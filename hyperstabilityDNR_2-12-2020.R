@@ -324,6 +324,45 @@ hist(ps)
 #lm(loganCPUE~logefCPUE*species), efCPUE + species + efCPUE:species
 #B0 + b1efCPUE + B2*species +B3efCPUE scpeies
 
+#add in Building density 
+buildDensity2018=gdriveURL("https://drive.google.com/open?id=11lPPduqiXIxz00fm6xxFzUA8u9nCOBnN")
+#joining building density to bass catch + abund info
+bassbuildJoin=left_join(bassJoin,buildDensity2018,by="WBIC")
+bassbuildJoin=bassbuildJoin[!is.na(bassbuildJoin$buildingCount50m),]
+#only 28 unique ones, 94 entries with wbics that have lake density estimates (about 25%)
+
+#building density numbers for walleye lake yr observations
+wallbuildJoin=left_join(wallJoin,buildDensity2018,by="WBIC")
+wallbuildJoin=wallbuildJoin[!is.na(wallbuildJoin$buildingCount50m),]
+#103 observations with walleye info + building density
+
+#builing density numbers for panfish lake yr observations
+panbuildJoin=left_join(panJoin,buildDensity2018,by="WBIC")
+panbuildJoin=panbuildJoin[!is.na(panbuildJoin$buildingCount50m),]
+#44 observations
+
+#model fits
+
+fit4<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildingDensity200m)
+summary(fit4)#nothing significant 
+
+#looking at residuals as a function of building density,look at relationship between beta and density
+VilasBassFit<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildingCount200m)
+plot(bassbuildJoin$buildingDensity200m,residuals(VilasBassFit))
+residuals(VilasBassFit)
+
+
+fit5<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun+panbuildJoin$logAbun:panbuildJoin$buildingDensity200m)
+summary(fit5)#look at p value
+VilasPanFit<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun)
+plot(panbuildJoin$buildingDensity200m,residuals(VilasPanFit))
+
+fit6<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun+wallbuildJoin$logAbun:wallbuildJoin$buildingDensity200m)
+summary(fit6)#look at p value
+VilasWallFit<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun)
+plot(wallbuildJoin$buildingDensity200m,residuals(VilasWallFit), 
+     main="relationship between walleye betas and building density", ylab="Residuals")
+
 #add in CWH
 #bringing in coarse woody habitat estimates from Jake Ziegler data from YOY mort. study
 CWHdensity=gdriveURL("https://drive.google.com/open?id=1x1_JdeamiU2auqrlPQ3G_wA6Spuf0vwf")
@@ -341,23 +380,24 @@ panCWHJoin=left_join(panJoin,CWHdensity,by="WBIC")
 panCWHJoin=panCWHJoin[!is.na(panCWHJoin$Total.CWH.per.km.shoreline),]
 #only 12 big yikes
 
+#model fits, fix to plots with residuals and CWH interactions
 
-#add in Building density 
-buildDensity2018=gdriveURL("https://drive.google.com/open?id=11lPPduqiXIxz00fm6xxFzUA8u9nCOBnN")
-#joining building density to bass catch + abund info
-bassbuildJoin=left_join(bassJoin,buildDensity2018,by="WBIC")
-bassbuildJoin=bassbuildJoin[!is.na(bassbuildJoin$buildingCount50m),]
-#only 28 unique ones, 94 entries with wbics that have lake density estimates (about 25%)
+fit7<-glm(bassbuildCWHJoin$logCPUE~bassbuildCWHJoin$logAbun+bassbuildCWHJoin$logAbun:bassbuildCWHJoin$Total.CWH.per.km.shoreline)
+summary(fit7)#not significant
+CWHBassFit<-glm(bassbuildCWHJoin$logCPUE~bassbuildCWHJoin$logAbun)
+plot(bassbuildCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHBassFit))
 
-#building density numbers for walleye lake yr observations
-wallbuildJoin=left_join(wallJoin,buildDensity2018,by="WBIC")
-wallbuildJoin=wallbuildJoin[!is.na(wallbuildJoin$buildingCount50m),]
-#103 observations with walleye info + building density
+fit8<-glm(panCWHJoin$logCPUE~panCWHJoin$logAbun+panCWHJoin$logAbun:panCWHJoin$Total.CWH.per.km.shoreline)
+summary(fit8)#not significant
+CWHPanFit<-glm(panCWHJoin$logCPUE~panCWHJoin$logAbun)
+plot(panCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHPanFit))
 
-#builing density numbers for panfish lake yr observations
-panbuildJoin=left_join(panJoin,buildDensity2018,by="WBIC")
-panbuildJoin=panbuildJoin[!is.na(panbuildJoin$buildingCount50m),]
-#44 observations
+
+fit9<-glm(wallCWHJoin$logCPUE~wallCWHJoin$logAbun+wallCWHJoin$logAbun:wallCWHJoin$Total.CWH.per.km.shoreline)
+summary(fit9)#not significant 
+CWHWallFit<-glm(wallbuildCWHJoin$logCPUE~wallbuildCWHJoin$logAbun)
+plot(wallbuildCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHWallFit))
+
 
 #checking which lakes have CWH and buidling density info for a given species
 
