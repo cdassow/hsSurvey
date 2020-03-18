@@ -257,6 +257,11 @@ summary(fit2)
 plot(x=panJoin$logAbun,y=panJoin$logCPUE)
 abline(fit2)
 
+#subsetting to just look at the number of bluegill obs, may be useful later with BLG vs LMB 
+BLGJoin=panJoin[panJoin$species=="BLUEGILL",]
+BLGfit<-glm(BLGJoin$logCPUE~BLGJoin$logAbun)
+summary(BLGfit)
+
 #normal spcae plot of model fit to the data, qN^B
 #coefficients 2 is beta
 plot(x=panJoin$meanEF_CPEkm,y=panJoin$meanCPUE)
@@ -320,10 +325,107 @@ hist(ps)
 #B0 + b1efCPUE + B2*species +B3efCPUE scpeies
 
 #add in CWH
+#bringing in coarse woody habitat estimates from Jake Ziegler data from YOY mort. study
+CWHdensity=gdriveURL("https://drive.google.com/open?id=1x1_JdeamiU2auqrlPQ3G_wA6Spuf0vwf")
+#only 61 observations*
+
+bassCWHJoin=left_join(bassJoin,CWHdensity,by="WBIC")
+bassCWHJoin=bassCWHJoin[!is.na(bassCWHJoin$Total.CWH.per.km.shoreline),]
+#not all shoreline data points have wood data, still only 23 observations
+
+wallCWHJoin=left_join(wallJoin,CWHdensity,by="WBIC")
+wallCWHJoin=wallCWHJoin[!is.na(wallCWHJoin$Total.CWH.per.km.shoreline),]
+#only 27 observations for wall lakes with CWH density info
+
+panCWHJoin=left_join(panJoin,CWHdensity,by="WBIC")
+panCWHJoin=panCWHJoin[!is.na(panCWHJoin$Total.CWH.per.km.shoreline),]
+#only 12 big yikes
+
 
 #add in Building density 
+buildDensity2018=gdriveURL("https://drive.google.com/open?id=11lPPduqiXIxz00fm6xxFzUA8u9nCOBnN")
+#joining building density to bass catch + abund info
+bassbuildJoin=left_join(bassJoin,buildDensity2018,by="WBIC")
+bassbuildJoin=bassbuildJoin[!is.na(bassbuildJoin$buildingCount50m),]
+#only 28 unique ones, 94 entries with wbics that have lake density estimates (about 25%)
+
+#building density numbers for walleye lake yr observations
+wallbuildJoin=left_join(wallJoin,buildDensity2018,by="WBIC")
+wallbuildJoin=wallbuildJoin[!is.na(wallbuildJoin$buildingCount50m),]
+#103 observations with walleye info + building density
+
+#builing density numbers for panfish lake yr observations
+panbuildJoin=left_join(panJoin,buildDensity2018,by="WBIC")
+panbuildJoin=panbuildJoin[!is.na(panbuildJoin$buildingCount50m),]
+#44 observations
+
+#checking which lakes have CWH and buidling density info for a given species
+
+bassbuildCWHJoin=left_join(bassbuildJoin,CWHdensity,by="WBIC")
+bassbuildCWHJoin=bassbuildCWHJoin[!is.na(bassbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
+#trimming table for values with measurements for CWH info and building density, only 23 obs
+panbuildCWHJoin=left_join(panbuildJoin,CWHdensity,by="WBIC")
+panbuildCWHJoin=panbuildCWHJoin[!is.na(panbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
+#12 obs
+
+wallbuildCWHJoin=left_join(wallbuildJoin,CWHdensity,by="WBIC")
+wallbuildCWHJoin=wallbuildCWHJoin[!is.na(wallbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
+#27 obs
 
 #add in lake characterisitcs
+linfo<-gdriveURL("https://drive.google.com/open?id=1ot9rEYnCG07p7aUxbeqN2mJ3cNrzYA0Y")
+linfo=linfo[,1:13]
+#join fish info with lake info using the waterbody codes
+bassLinfo<-left_join(bassJoin,linfo,by="WBIC")
+wallLinfo<-left_join(wallJoin,linfo,by="WBIC")
+panLinfo<-left_join(panJoin,linfo,by="WBIC")
+BLGJoinLinfo<-left_join(BLGJoin,linfo,by="WBIC")
+
+
+#model fits, testing out bass first
+#lake depth
+BassLDepth<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$maxDepth)
+summary(BassLDepth)#no
+#lake size
+BassLsize<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$sizeAcres)
+summary(BassLsize)#no
+#lake type
+BassLtype<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$lakeType)
+summary(BassLtype)#no
+#water clarity
+BassLclar<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$waterClarity)
+summary(BassLclar)#no
+
+#will check for walleye
+#lake depth
+WallLDepth<-glm(wallLinfo$logCPUE~wallLinfo$logAbun+wallLinfo$logAbun:wallLinfo$maxDepth)
+summary(WallLDepth)#no
+#lake size
+WallLsize<-glm(wallLinfo$logCPUE~wallLinfo$logAbun+wallLinfo$logAbun:wallLinfo$sizeAcres)
+summary(WallLsize)#no
+#lake type
+WallLtype<-glm(wallLinfo$logCPUE~wallLinfo$logAbun+wallLinfo$logAbun:wallLinfo$lakeType)
+summary(WallLtype)#no
+#water clarity
+WallLclar<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$waterClarity)
+summary(WallLclar)#no
+
+#looking at linfo with panfish obs
+
+PanLDepth<-glm(panLinfo$logCPUE~panLinfo$logAbun+panLinfo$logAbun:panLinfo$maxDepth)
+summary(PanLDepth)#no
+#lake size
+PanLsize<-glm(panLinfo$logCPUE~panLinfo$logAbun+panLinfo$logAbun:panLinfo$sizeAcres)
+summary(PanLsize)#no
+#lake type
+PanLtype<-glm(panLinfo$logCPUE~panLinfo$logAbun+panLinfo$logAbun:panLinfo$lakeType)
+summary(PanLtype)#small signif with drainedge lake type 
+#water clarity
+PanLclar<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$waterClarity)
+summary(WallLclar)#no
+
+
+
 
 #add in fishscapes data from 2018-2019 
 
