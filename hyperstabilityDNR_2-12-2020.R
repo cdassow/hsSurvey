@@ -435,6 +435,16 @@ summary(BassLtype)#no
 #water clarity
 BassLclar<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$waterClarity)
 summary(BassLclar)#no
+#mean depth
+BassLmDepth<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$meanDepth)
+summary(BassLmDepth)#no
+#survey year
+BassLyear<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$surveyYear)
+summary(BassLyear)#no
+#fish present
+BassLfishpresent<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$fishPresent)
+summary(BassLfishpresent)#no too many combinations, combined characters
+
 
 #will check for walleye
 #lake depth
