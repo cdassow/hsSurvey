@@ -312,11 +312,19 @@ plot(betas, ps)
 hist(betas, main = "walleye betas")
 hist(ps)
 
-#pullin in CWH info/linfo join with WBIC, keep all rows and fill in NA where its missing, dpplyr left join (bass,wood)
-#shoreline development numbers for lakes, GIS dane and alex ross
+
 #literature review for building density vilas co., anna marburg
 #try model with dummy variable to compare species to each other fit
 
 #lm(loganCPUE~logefCPUE*species), efCPUE + species + efCPUE:species
 #B0 + b1efCPUE + B2*species +B3efCPUE scpeies
+
+#add in CWH
+
+#add in Building density 
+
+#add in lake characterisitcs
+
+#add in fishscapes data from 2018-2019 
+
 
