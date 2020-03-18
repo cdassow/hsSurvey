@@ -465,8 +465,36 @@ PanLclar<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$wa
 summary(WallLclar)#no
 
 
-
-
 #add in fishscapes data from 2018-2019 
 
+length(unique(bassbuildJoin$WBIC))
 
+#add in fishscapes lake data and run the same models
+
+library(readxl)
+LMB2019 <- read_excel("pe2019-CM-3-5-20.xlsx")
+View(LMB2019)
+#plotting catch vs abundance
+#note: totalCPETime = totalNum/timeEffort, totalCPEDistMI=totalNum/distEffortmi, 
+#totalCPEDistKM=totalNum/distEffortkm
+library(ggplot2)
+ggplot(LMB2019, aes(x=nHat,y=totalCPEDistKM))+geom_point()
+ggplot(LMB2019, aes(x=nHat,y=totalCPETime))+geom_point()
+
+Fishfit<-glm(LMB2019$totalCPETime~LMB2019$nHat)
+summary(Fishfit)
+
+LMB2018<-gdriveURL("https://drive.google.com/open?id=11YqL34QNdqwg59TdKAXL0t2sYd2yN7GY")
+
+#make survey year column for 2018-19 fish data then join tables
+LMB2018$surveyYear=2018
+LMB2019$surveyYear=2019
+
+#making effort columns with the same names to join columns and datasets
+LMB2019$fishPerKmShoreline=LMB2019$distEffortkm
+LMB=full_join(LMB2018[,2:14],LMB2019[,2:16])
+
+LMBfit<-glm(LMB$distEffortkm~LMB$nHat)
+summary(LMBfit)
+
+#do not see any hyperstability present for obs, only few may be the reason
