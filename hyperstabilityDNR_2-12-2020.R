@@ -242,7 +242,7 @@ abline(fit1)
 #normal spcae plot of model fit to the data, exponential(intercept)*x^slope this is qN^B
 #coefficients 2 is beta
 plot(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE)
-plot(1:65,exp(fit1$coefficients[1])*(1:65)^fit1$coefficients[2])
+plot(1:65,exp(fit1$coefficients[1])*(1:65)^fit1$coefficients[2], ylab="logCPUE (angling CPUE)", xlab="logAbun (efCPUE)", main = "Hyperstability of bass ")
 #can use lines function as well
 
 ggplot(bassJoin,aes(bassJoin$meanEF_CPEkm,bassJoin$meanCPUE))+
@@ -282,7 +282,8 @@ plot(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE)
 plot(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2])
 
 ### Ploting hyperstability ###
-plot(x=1:165,y=exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2], col='blue', type = "l",ylim = c(0,5))
+plot(x=1:165,y=exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2], col='blue', type = "l",ylim = c(0,5),
+     main = "Hyperstability of fish Species in WI")
 lines(1:165,exp(fit1$coefficients[1])*(1:165)^fit1$coefficients[2],col="red")
 lines(1:165,exp(fit2$coefficients[1])*(1:165)^fit2$coefficients[2],col="darkgreen")
 
