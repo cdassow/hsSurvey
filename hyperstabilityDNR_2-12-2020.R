@@ -221,6 +221,16 @@ LMBvsWall<-lm(LMBplusWall$logCPUE~LMBplusWall$logAbun*LMBplusWall$species)
 summary(LMBvsWall)
 #Walleye statistically significant different from LMB hyperstability similar lines on fit
 
+#Bass vs panfish
+LMBplusPan=rbind(bassJoin[bassJoin$species=="LARGEMOUTH BASS",],panJoin)
+LMBvsPan<- lm(LMBplusPan$logCPUE~LMBplusPan$logAbun*LMBplusPan$species)
+summary(LMBvsPan)
+
+#Panfish vs walleye 
+PanplusWall=rbind(panJoin,wallJoin)
+PanvsWall<-lm(PanplusWall$logCPUE~PanplusWall$logAbun*PanplusWall$species)
+summary(PanvsWall)
+
 #plotting bass fit and LMBvsSMB fits
 plot(x=bassJoin$logAbun,y=bassJoin$logCPUE)
 abline(LMBvsSMB, col="red")
@@ -261,6 +271,22 @@ abline(fit2)
 BLGJoin=panJoin[panJoin$species=="BLUEGILL",]
 BLGfit<-glm(BLGJoin$logCPUE~BLGJoin$logAbun)
 summary(BLGfit)
+
+LMBplusBLG=rbind(bassJoin[bassJoin$species=="LARGEMOUTH BASS",],BLGJoin)
+LMBvsBLG<-lm(LMBplusBLG$logCPUE~LMBplusBLG$logAbun*LMBplusBLG$species)
+summary(LMBvsBLG)
+#Walleye statistically significant different from LMB hyperstability similar lines on fit
+
+#Bass vs bluegill
+BassplusBLG=rbind(bassJoin,BLGJoin)
+BassvsBLG<-lm(BassplusBLG$logCPUE~BassplusBLG$logAbun*BassplusBLG$species)
+summary(BassvsBLG)#sign differences in effect just largemouth not smallmouth
+
+#Bluegill vs walleye 
+BLGplusWall=rbind(BLGJoin,wallJoin)
+BLGvsWall<-lm(BLGplusWall$logCPUE~BLGplusWall$logAbun*BLGplusWall$species)
+summary(BLGvsWall)
+
 
 #normal spcae plot of model fit to the data, qN^B
 #coefficients 2 is beta
