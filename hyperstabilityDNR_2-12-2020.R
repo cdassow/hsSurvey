@@ -280,7 +280,7 @@ summary(LMBvsBLG)
 #Bass vs bluegill
 BassplusBLG=rbind(bassJoin,BLGJoin)
 BassvsBLG<-lm(BassplusBLG$logCPUE~BassplusBLG$logAbun*BassplusBLG$species)
-summary(BassvsBLG)#sign differences in effect just largemouth not smallmouth
+summary(BassvsBLG)#sign differences in effect just largemouth not smallmouth, not signif. diferent from Small
 
 #Bluegill vs walleye 
 BLGplusWall=rbind(BLGJoin,wallJoin)
@@ -308,10 +308,11 @@ plot(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE)
 plot(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2])
 
 ### Ploting hyperstability ###
-plot(x=1:165,y=exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2], col='blue', type = "l",ylim = c(0,5),
+plot(x=1:165,y=exp(fit1$coefficients[1])*(1:165)^fit1$coefficients[2], col='blue', type = "l",ylim = c(0,5),
      main = "Hyperstability of fish Species in WI")
-lines(1:165,exp(fit1$coefficients[1])*(1:165)^fit1$coefficients[2],col="red")
-lines(1:165,exp(fit2$coefficients[1])*(1:165)^fit2$coefficients[2],col="darkgreen")
+lines(1:165,exp(fit2$coefficients[1])*(1:165)^fit2$coefficients[2],col="red")
+lines(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2],col="darkgreen")
+legend("topright",paste("Fit = ",c("LMB","Panfish","Walleye")), lty = 1:5, col = 1:5)
 
 
 #using betaBootstrapping R script to calucate betas from model fit to simulated data
@@ -409,7 +410,7 @@ panCWHJoin=panCWHJoin[!is.na(panCWHJoin$Total.CWH.per.km.shoreline),]
 
 #model fits, fix to plots with residuals and CWH interactions
 
-fit7<-glm(bassbuildCWHJoin$logCPUE~bassbuildCWHJoin$logAbun+bassbuildCWHJoin$logAbun:bassbuildCWHJoin$Total.CWH.per.km.shoreline)
+fit7<-glm(bassCWHJoin$logCPUE~bassCWHJoin$logAbun+bassCWHJoin$logAbun:bassCWHJoin$Total.CWH.per.km.shoreline)
 summary(fit7)#not significant
 CWHBassFit<-glm(bassbuildCWHJoin$logCPUE~bassbuildCWHJoin$logAbun)
 plot(bassbuildCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHBassFit))
