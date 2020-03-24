@@ -150,9 +150,6 @@ nrow(panJoin)
 nrow(lake_yearWALLef)
 nrow(wallJoin)
 
-#look at counties that we have abundance and creel data for
-WallCounty<-full_join(walleyeEF,lake_yearCPUE)
-
 
 
 library(ggplot2)
@@ -508,6 +505,25 @@ summary(PanLtype)#small signif with drainedge lake type
 #water clarity
 PanLclar<-glm(bassLinfo$logCPUE~bassLinfo$logAbun+bassLinfo$logAbun:bassLinfo$waterClarity)
 summary(WallLclar)#no
+
+#look at county and survey year effects on hyperstavility
+CountBassfit<-glm(bassJoin$logCPUE~bassJoin$logAbun+bassJoin$logAbun:bassJoin$county)
+summary(CountBassfit)#bayfield, forest, polk, price low signif.
+
+CountPanfit<-glm(panJoin$logCPUE~panJoin$logAbun+panJoin$logAbun:panJoin$county)
+summary(CountPanfit)#forest high signif.
+
+CountWallfit<-glm(wallJoin$logCPUE~wallJoin$logAbun+wallJoin$logAbun:wallJoin$county)
+summary(CountWallfit)#none 
+
+YearBassfit<-glm(bassJoin$logCPUE~bassJoin$logAbun+bassJoin$logAbun:bassJoin$surveyYear)
+summary(YearBassfit)#none
+
+YearPanfit<-glm(panJoin$logCPUE~panJoin$logAbun+panJoin$logAbun:panJoin$surveyYear)
+summary(YearPanfit)#none
+
+YearWallfit<-glm(wallJoin$logCPUE~wallJoin$logAbun+wallJoin$logAbun:wallJoin$surveyYear)
+summary(YearWallfit)#small signif. 
 
 
 #add in fishscapes data from 2018-2019 
