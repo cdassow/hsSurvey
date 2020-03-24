@@ -17,7 +17,7 @@ creel2=gdriveURL("https://drive.google.com/open?id=1UYhbGH28WXjmi-4BzhfwO4KYwrBC
 creel=rbind(creel1,creel2)
 
 # reduce to columns we care about
-creel=creel[,c(3,6,12,18,25:26,30,36,38)]
+creel=creel[,c(1,3,6,12,18,25:26,30,36,38)]
 
 # calculate effort
 # add zeroes to times with only 2 or 3 digits
@@ -65,7 +65,7 @@ creel=creel[creel$anglingCPUE<30,]
 
 # calculate average angling CPUE and sample size for each lake-year-species combination
 lake_yearCPUE=creel %>%
-              group_by(WBIC,fishSpeciesCode,surveyYear) %>%
+              group_by(WBIC,fishSpeciesCode,surveyYear,county) %>%
               summarize(meanCPUE=mean(anglingCPUE),
                         N=n())
 lake_yearCPUE=as.data.frame(lake_yearCPUE)
@@ -74,11 +74,11 @@ lake_yearCPUE=as.data.frame(lake_yearCPUE)
 
 ####### electrofishing abundance
 bassEF=gdriveURL("https://drive.google.com/open?id=11v8FbT2wnKx_CqUfxu_V9r_8fyCfcdD2")
-bassEF=bassEF[,c(3,5,13,19,27:29)]
+bassEF=bassEF[,c(1,3,5,13,19,27:29)]
 bassEF$CPEkm=bassEF$CPEmile/1.60934   # convert fish per mile to fish per km
 bassEF$distanceShockedKm=bassEF$distanceShockedMiles*0.621371 # convert miles to km
 lake_yearBASSef= bassEF %>%
-  group_by(WBIC,species,surveyYear) %>%
+  group_by(WBIC,species,surveyYear,county) %>%
   summarize(meanEF_CPEkm=mean(CPEkm),
             totalFishCaught=sum(totalNumberCaughtFish),
             totalDistShockedKm=sum(distanceShockedKm),
@@ -89,11 +89,11 @@ lake_yearBASSef=as.data.frame(lake_yearBASSef)
 
 
 panEF=gdriveURL("https://drive.google.com/open?id=1QIqCBQ9gbOgRFUJQbnokwwTZJi5VZZIR")
-panEF=panEF[,c(3,5,13,19,25:27)]
+panEF=panEF[,c(1,3,5,13,19,25:27)]
 panEF$CPEkm=panEF$CPEmile/1.60934   # convert fish per mile to fish per km
 panEF$distanceShockedKm=panEF$distanceShockedMiles*0.621371 # convert miles to km
 lake_yearPANef= panEF %>%
-  group_by(WBIC,species,surveyYear) %>%
+  group_by(WBIC,species,surveyYear,county) %>%
   summarize(meanEF_CPEkm=mean(CPEkm),
             totalFishCaught=sum(totalNumberCaughtFish),
             totalDistShockedKm=sum(distanceShockedKm),
@@ -103,13 +103,13 @@ lake_yearPANef= panEF %>%
 lake_yearPANef=as.data.frame(lake_yearPANef)
 
 walleyeEF=gdriveURL("https://drive.google.com/open?id=1DPRROWv6Cf_fP6Z-kE9ZgUfdf_F_jSNT")
-walleyeEF=walleyeEF[,c(3,5,13,19,23:24,27)]
+walleyeEF=walleyeEF[,c(1,3,5,13,19,23:24,27)]
 walleyeEF$CPEkm=walleyeEF$CPEmile/1.60934   # convert fish per mile to fish per km
 walleyeEF$distanceShockedKm=walleyeEF$distanceShockedMiles*0.621371 # convert miles to km
 #remove commas from total fish caught
 walleyeEF$totalNumberCaughtFish=as.numeric(gsub(",","",walleyeEF$totalNumberCaughtFish))
 lake_yearWALLef= walleyeEF %>%
-  group_by(WBIC,species,surveyYear) %>%
+  group_by(WBIC,species,surveyYear,county) %>%
   summarize(meanEF_CPEkm=mean(CPEkm),
             totalFishCaught=sum(totalNumberCaughtFish),
             totalDistShockedKm=sum(distanceShockedKm),
@@ -132,14 +132,14 @@ lake_yearCPUE$species[lake_yearCPUE$fishSpeciesCode=="W09"]="BLUEGILL"
 # trim species without EF data (can we get other species EF data?)
 lake_yearCPUE=lake_yearCPUE[lake_yearCPUE$species!="",]
 
-bassJoin=left_join(lake_yearBASSef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear"))
+bassJoin=left_join(lake_yearBASSef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear", "county"="county"))
 bassJoin=bassJoin[!is.na(bassJoin$meanCPUE),]
 
-panJoin=left_join(lake_yearPANef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear"))
+panJoin=left_join(lake_yearPANef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear", "county"="county"))
 panJoin=panJoin[!is.na(panJoin$meanCPUE),]
 
 
-wallJoin=left_join(lake_yearWALLef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear"))
+wallJoin=left_join(lake_yearWALLef,lake_yearCPUE,by=c("WBIC"="WBIC","species"="species","surveyYear"="surveyYear", "county"="county"))
 wallJoin=wallJoin[!is.na(wallJoin$meanCPUE),]
 
 table(lake_yearCPUE$species)
@@ -149,6 +149,11 @@ nrow(lake_yearPANef)
 nrow(panJoin)
 nrow(lake_yearWALLef)
 nrow(wallJoin)
+
+#look at counties that we have abundance and creel data for
+WallCounty<-full_join(walleyeEF,lake_yearCPUE)
+
+
 
 library(ggplot2)
 
@@ -232,9 +237,11 @@ PanvsWall<-lm(PanplusWall$logCPUE~PanplusWall$logAbun*PanplusWall$species)
 summary(PanvsWall)
 
 #plotting bass fit and LMBvsSMB fits
-plot(x=bassJoin$logAbun,y=bassJoin$logCPUE)
+plot(x=bassJoin$logAbun,y=bassJoin$logCPUE, main = "Hyperstability of Bass in WI (1995-2016)",
+     xlab = "Fish density (log ef CPUE)", ylab= "Catch rate (log angling CPUE)" )
 abline(LMBvsSMB, col="red")
 abline(fit1, col="blue")
+legend("bottomright",paste("Fit = ",c("LMB vs SMB","Bass")), lty = 1, col = 1:2, bty = "n")
 
 #general linear model for bass, using glm function 
 fit1<-glm(bassJoin$logCPUE~bassJoin$logAbun)
