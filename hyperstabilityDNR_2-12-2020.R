@@ -356,26 +356,35 @@ hist(ps)
 #lm(loganCPUE~logefCPUE*species), efCPUE + species + efCPUE:species
 #B0 + b1efCPUE + B2*species +B3efCPUE scpeies
 
-#add in Building density 
+#add in Building density *only for year 2018 
 buildDensity2018=gdriveURL("https://drive.google.com/open?id=11lPPduqiXIxz00fm6xxFzUA8u9nCOBnN")
+
+library(readxl)
+NTLBuild<- read_excel("NTLBuildDensData(2001-2004).xlsx")
+
+#fixing column names to join tables 
+NTLBuild$WBIC=NTLBuild$wbic
+NTLBuild$surveyYear=NTLBuild$survey_year
+NTLBuild<-NTLBuild[,c(1:4,8:34)]
+
 #joining building density to bass catch + abund info
-bassbuildJoin=left_join(bassJoin,buildDensity2018,by="WBIC")
-bassbuildJoin=bassbuildJoin[!is.na(bassbuildJoin$buildingCount50m),]
-#only 28 unique ones, 94 entries with wbics that have lake density estimates (about 25%)
+bassbuildJoin=left_join(bassJoin,NTLBuild, by="WBIC","surveyYear")
+bassbuildJoin=bassbuildJoin[!is.na(bassbuildJoin$buildings_per_km),]
+#only 24 observations left of 62
 
 #building density numbers for walleye lake yr observations
-wallbuildJoin=left_join(wallJoin,buildDensity2018,by="WBIC")
-wallbuildJoin=wallbuildJoin[!is.na(wallbuildJoin$buildingCount50m),]
-#103 observations with walleye info + building density
+wallbuildJoin=left_join(wallJoin,NTLBuild,by="WBIC","surveyYear")
+wallbuildJoin=wallbuildJoin[!is.na(wallbuildJoin$buildings_per_km),]
+#28 observations left of 62
 
 #builing density numbers for panfish lake yr observations
-panbuildJoin=left_join(panJoin,buildDensity2018,by="WBIC")
-panbuildJoin=panbuildJoin[!is.na(panbuildJoin$buildingCount50m),]
-#44 observations
+panbuildJoin=left_join(panJoin,NTLBuild,by="WBIC","surveyYear")
+panbuildJoin=panbuildJoin[!is.na(panbuildJoin$buildings_per_km),]
+#only 12 observations left of 62
 
 #model fits
 
-fit4<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildingDensity200m)
+fit4<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildings_per_km)
 summary(fit4)#nothing significant 
 
 #looking at residuals as a function of building density,look at relationship between beta and density
