@@ -233,13 +233,6 @@ PanplusWall=rbind(panJoin,wallJoin)
 PanvsWall<-lm(PanplusWall$logCPUE~PanplusWall$logAbun*PanplusWall$species)
 summary(PanvsWall)
 
-#plotting bass fit and LMBvsSMB fits
-plot(x=bassJoin$logAbun,y=bassJoin$logCPUE, main = "Hyperstability of Bass in WI (1995-2016)",
-     xlab = "Fish density (log ef CPUE)", ylab= "Catch rate (log angling CPUE)" )
-abline(LMBvsSMB, col="red")
-abline(fit1, col="blue")
-legend("bottomright",paste("Fit = ",c("LMB vs SMB","Bass")), lty = 1, col = 1:2, bty = "n")
-
 #general linear model for bass, using glm function 
 fit1<-glm(bassJoin$logCPUE~bassJoin$logAbun)
 summary(fit1)
@@ -247,6 +240,13 @@ summary(fit1)
 LMBvsSMB<-lm(bassJoin$logCPUE~bassJoin$logAbun*bassJoin$species)
 summary(LMBvsSMB)
 #both are hyperstable but largemouth bass are more hyperstable 
+
+#plotting bass fit and LMBvsSMB fits
+plot(x=bassJoin$logAbun,y=bassJoin$logCPUE, main = "Hyperstability of Bass in WI (1995-2016)",
+     xlab = "Fish density (log ef CPUE)", ylab= "Catch rate (log angling CPUE)" )
+abline(LMBvsSMB, col="red")
+abline(fit1, col="blue")
+legend("bottomright",paste("Fit = ",c("LMB vs SMB","Bass")), lty = 1, col = 1:2, bty = "n")
 
 
 #ploting model with fit line bass log transformed abund. and CPUE
@@ -385,24 +385,29 @@ panbuildJoin=panbuildJoin[!is.na(panbuildJoin$buildings_per_km),]
 #model fits
 
 fit4<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildings_per_km)
-summary(fit4)#nothing significant 
+summary(fit4)#nothing signifcant
+
+fit4.1<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildings_per_km_quintile)
+summary(fit4.1)#small signif.
 
 #looking at residuals as a function of building density,look at relationship between beta and density
-VilasBassFit<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildingCount200m)
-plot(bassbuildJoin$buildingDensity200m,residuals(VilasBassFit))
+VilasBassFit<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildings_per_km_quintile)
+plot(bassbuildJoin$buildings_per_km_quintile,residuals(VilasBassFit))
 residuals(VilasBassFit)
 
 
-fit5<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun+panbuildJoin$logAbun:panbuildJoin$buildingDensity200m)
-summary(fit5)#look at p value
-VilasPanFit<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun)
-plot(panbuildJoin$buildingDensity200m,residuals(VilasPanFit))
+fit5<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun+panbuildJoin$logAbun:panbuildJoin$buildings_per_km)
+summary(fit5)#not significant
 
-fit6<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun+wallbuildJoin$logAbun:wallbuildJoin$buildingDensity200m)
-summary(fit6)#look at p value
-VilasWallFit<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun)
-plot(wallbuildJoin$buildingDensity200m,residuals(VilasWallFit), 
-     main="relationship between walleye betas and building density", ylab="Residuals")
+fit5.1<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun+panbuildJoin$logAbun:panbuildJoin$buildings_per_km)
+summary(fit5.1)#not sig.
+
+fit6<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun+wallbuildJoin$logAbun:wallbuildJoin$buildings_per_km)
+summary(fit6)#not sig. netiher building quintile
+
+#VilasWallFit<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun)
+#plot(wallbuildJoin$buildingDensity200m,residuals(VilasWallFit), 
+#    main="relationship between walleye betas and building density", ylab="Residuals")
 
 #add in CWH
 #bringing in coarse woody habitat estimates from Jake Ziegler data from YOY mort. study
@@ -438,6 +443,21 @@ fit9<-glm(wallCWHJoin$logCPUE~wallCWHJoin$logAbun+wallCWHJoin$logAbun:wallCWHJoi
 summary(fit9)#not significant 
 CWHWallFit<-glm(wallbuildCWHJoin$logCPUE~wallbuildCWHJoin$logAbun)
 plot(wallbuildCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHWallFit))
+
+#Coarse woody habitat data from NTL database 
+CWH<-read.csv("NTLCwhData(2001-2004).csv")
+
+#count number of logs for each plot, and make column for logs per plot
+CWH$logs_per_plot=length(CWH$type[CWH$type=="LOG"])
+
+#group logs per plot by lake then sum in new category Log per 400m, may go ahead and convert to km
+
+#add wbics for the lakes 
+
+#glm for CWH 
+
+
+
 
 
 #checking which lakes have CWH and buidling density info for a given species
@@ -533,6 +553,48 @@ summary(YearPanfit)#none
 
 YearWallfit<-glm(wallJoin$logCPUE~wallJoin$logAbun+wallJoin$logAbun:wallJoin$surveyYear)
 summary(YearWallfit)#small signif. 
+
+#conductivity, hydrology type, mean depth,
+
+ConductB<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$conductance_biocom)
+summary(ConductB)#* sig for conductance_biocom
+
+ConductP<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun+panbuildJoin$logAbun:panbuildJoin$conductance_biocom)
+summary(ConductP)#no
+
+ConductW<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun+wallbuildJoin$logAbun:wallbuildJoin$conductance_biocom)
+summary(ConductW)#no
+
+HyrdoB<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$hydrology_type)
+summary(HyrdoB)#no
+
+HydroP<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun+panbuildJoin$logAbun:panbuildJoin$hydrology_type)
+summary(HydroP)#no
+
+HydroW<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun+wallbuildJoin$logAbun:wallbuildJoin$hydrology_type)
+summary(HydroW)#no
+
+DepthB<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$depth_mean)
+summary(DepthB)#small sign. (.),not for max depth
+
+DepthP<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun+panbuildJoin$logAbun:panbuildJoin$depth_meam)
+summary(DepthP)#no, no max depth
+
+DepthW<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun+wallbuildJoin$logAbun:wallbuildJoin$depth_mean)
+summary(DepthW)#no, no max depth
+
+PerimB<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$perimeter)
+summary(PerimB)#no, not for area 
+
+PerimP<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun+panbuildJoin$logAbun:panbuildJoin$perimeter)
+summary(PerimP)#no, not for area
+
+PerimW<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun+wallbuildJoin$logAbun:wallbuildJoin$perimeter)
+summary(PerimW)#no, not for area
+
+B<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun)
+P<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun)
+W<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun)
 
 
 #add in fishscapes data from 2018-2019 
