@@ -406,6 +406,15 @@ plot(wallbuildJoin$buildingDensity200m,residuals(VilasWallFit),
 
 #### Models with CWH density ####
 
+#bringing in CWH data from ntl data 2001-2004
+ntlCWH=read.csv("ntl125_2_v1_0.csv")
+
+#reducing columns to lake name, lake id, log present
+ntlCWH<-ntlCWH[,c(1,2,9)]
+
+#assigning numeric values to logs present
+ntlCWH=ntlCWH %>%
+
 #bringing in coarse woody habitat estimates from Jake Ziegler data from YOY mort. study
 CWHdensity=gdriveURL("https://drive.google.com/open?id=1x1_JdeamiU2auqrlPQ3G_wA6Spuf0vwf")
 #only 61 observations*
@@ -464,6 +473,25 @@ plot(wallbuildCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHWallFit))
 CwhNTL<-read.csv("CwhNTL2001-2004.csv")
 #no wbics, will come back to it 
 #will need to focus on lakeshore development data over CWH
+
+#bringing in CWH data from ntl data 2001-2004
+ntlCWH=read.csv("ntl125_2_v1_0.csv")
+
+#reducing columns to lake name, lake id, log present
+ntlCWH<-ntlCWH[,c(1,2,9)]
+
+#assigning numeric values to logs present
+ntlCWH=ntlCWH %>% 
+  mutate(numLog=recode(ntlCWH$type,"LOG"=1))
+
+#replacing NA's with 0 in the numLog column
+ntlCWH=ntlCWH[is.na(ntlCWH$numLog)==FALSE,]
+
+#summing observations by lake name
+lakeCWH=aggregate(ntlCWH$numLog,by=list(lakename=ntlCWH$lakename),FUN=sum)
+
+##using linfo to add WBICS to CWH counts
+
 
 #look at the relationship with county
 library(ggplot2)
