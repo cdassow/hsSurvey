@@ -409,12 +409,6 @@ plot(wallbuildJoin$buildingDensity200m,residuals(VilasWallFit),
 #bringing in CWH data from ntl data 2001-2004
 ntlCWH=read.csv("ntl125_2_v1_0.csv")
 
-#reducing columns to lake name, lake id, log present
-ntlCWH<-ntlCWH[,c(1,2,9)]
-
-#assigning numeric values to logs present
-ntlCWH=ntlCWH %>%
-
 #bringing in coarse woody habitat estimates from Jake Ziegler data from YOY mort. study
 CWHdensity=gdriveURL("https://drive.google.com/open?id=1x1_JdeamiU2auqrlPQ3G_wA6Spuf0vwf")
 #only 61 observations*
@@ -491,7 +485,43 @@ ntlCWH=ntlCWH[is.na(ntlCWH$numLog)==FALSE,]
 lakeCWH=aggregate(ntlCWH$numLog,by=list(lakename=ntlCWH$lakename),FUN=sum)
 
 ##using linfo to add WBICS to CWH counts
+lakeName<-linfo[,c(1,2,14)]
+lakeNameVilas<-lakeName[lakeName$county=="Vilas",]
+lakeNameVilas<-lakeNameVilas[,c(1,2)]
+colnames(lakeNameVilas)<-c("WBIC","lakename")
 
+lakeCWHVilas<-left_join(lakeCWH,lakeNameVilas,by="lakename")
+
+#calculating Log/KMshoreline as CWH density
+for(i in (1:nrow(lakeCWHVilas))){
+  lakeCWHVilas$CWHkm[i]<-lakeCWHVilas$x[i]/0.4
+}
+
+VilasCWHperKM<-lakeCWHVilas[,c(3,4)]
+
+#joining to tables 
+bassCWHJoin=left_join(bassJoin,VilasCWHperKM,by="WBIC")
+bassCWHJoin=bassCWHJoin[!is.na(bassCWHJoin$CWHkm),]
+#647 Observations
+
+wallCWHJoin=left_join(wallJoin,VilasCWHperKM,by="WBIC")
+wallCWHJoin=wallCWHJoin[!is.na(wallCWHJoin$CWHkm),]
+#1811 observations
+
+panCWHJoin=left_join(panJoin,VilasCWHperKM,by="WBIC")
+panCWHJoin=panCWHJoin[!is.na(panCWHJoin$CWHkm),]
+#287 observations
+
+#model fits
+#Bass
+CWHkmBassFit<-glm(bassCWHJoin$logCPUE~bassCWHJoin$logAbun+bassCWHJoin$logAbun:bassCWHJoin$CWHkm)
+summary(CWHkmBassFit)
+#Walleye
+CWHkmWallFit<-glm(wallCWHJoin$logCPUE~wallCWHJoin$logAbun+wallCWHJoin$logAbun:wallCWHJoin$CWHkm)
+summary(CWHkmWallFit)
+#Pan
+CWHkmPanFit<-glm(panCWHJoin$logCPUE~panCWHJoin$logAbun+panCWHJoin$logAbun:panCWHJoin$CWHkm)
+summary(CWHkmPanFit)
 
 #look at the relationship with county
 library(ggplot2)
