@@ -523,6 +523,8 @@ summary(CWHkmWallFit)
 CWHkmPanFit<-glm(panCWHJoin$logCPUE~panCWHJoin$logAbun+panCWHJoin$logAbun:panCWHJoin$CWHkm)
 summary(CWHkmPanFit)
 
+#check year number for observations
+
 #look at the relationship with county
 library(ggplot2)
 table(bassJoin$county)
