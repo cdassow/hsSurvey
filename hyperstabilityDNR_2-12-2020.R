@@ -502,10 +502,12 @@ VilasCWHperKM<-lakeCWHVilas[,c(3,4)]
 #joining to tables 
 bassCWHJoin=left_join(bassJoin,VilasCWHperKM,by="WBIC")
 bassCWHJoin=bassCWHJoin[!is.na(bassCWHJoin$CWHkm),]
+bassCWHJoin=bassCWHJoin[bassCWHJoin$surveyYear==c(2001:2004),] #ONLY 8 Obs.
 #647 Observations
 
 wallCWHJoin=left_join(wallJoin,VilasCWHperKM,by="WBIC")
 wallCWHJoin=wallCWHJoin[!is.na(wallCWHJoin$CWHkm),]
+wallCWHJoin=wallCWHJoin[wallCWHJoin$surveyYear==c(2001:2004),] #ONLY 4 Obs.
 #1811 observations
 
 panCWHJoin=left_join(panJoin,VilasCWHperKM,by="WBIC")
