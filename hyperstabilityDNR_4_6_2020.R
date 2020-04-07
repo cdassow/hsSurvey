@@ -478,22 +478,35 @@ ntlCWH=ntlCWH %>%
 
 
 #replacing NA's with 0 in the numLog column
-ntlCWH=ntlCWH[is.na(ntlCWH$numLog)==FALSE,]
+ntlCWH$numLog[is.na(ntlCWH$numLog)]=0
 
 #summing observations by lake name
 lakeCWH=aggregate(ntlCWH$numLog,by=list(lakename=ntlCWH$lakename),FUN=sum)
 
 ##using linfo to add WBICS to CWH counts
 linfo<-gdriveURL("https://drive.google.com/open?id=1ot9rEYnCG07p7aUxbeqN2mJ3cNrzYA0Y")
-linfo=linfo[,1:13]
+linfo=linfo[,1:14]
 #check line to get all 3 columns
-lakeName<-linfo[,c(1:2,14)]
+lakeName<-linfo[,c(1,2,14)]
 
 lakeNameVilas<-lakeName[lakeName$county=="Vilas",]
 lakeNameVilas<-lakeNameVilas[,c(1,2)]
 colnames(lakeNameVilas)<-c("WBIC","lakename")
 
 lakeCWHVilas<-left_join(lakeCWH,lakeNameVilas,by="lakename")
+
+#manually entering WBIC's for few NA's
+lakeCWHVilas$WBIC[is.na(lakeCWHVilas$WBIC)]=0
+
+lakeCWHVilas[9,3]=1591100
+lakeCWHVilas[28,3]=2766200
+lakeCWHVilas[37,3]=1596300
+lakeCWHVilas[52,3]=1872100
+
+#Little Rock Combination
+lakeCWHVilas[34,2]=127
+lakeCWHVilas[34,3]=1862100
+
 
 #calculating Log/KMshoreline as CWH density
 for(i in (1:nrow(lakeCWHVilas))){
@@ -502,18 +515,38 @@ for(i in (1:nrow(lakeCWHVilas))){
 
 VilasCWHperKM<-lakeCWHVilas[,c(3,4)]
 
-#joining to tables 
+#joining to tables -- 1995-2016 year subset
 bassCWHJoin=left_join(bassJoin,VilasCWHperKM,by="WBIC")
 bassCWHJoin=bassCWHJoin[!is.na(bassCWHJoin$CWHkm),]
-#647 Observations
+#23 obs
 
 wallCWHJoin=left_join(wallJoin,VilasCWHperKM,by="WBIC")
 wallCWHJoin=wallCWHJoin[!is.na(wallCWHJoin$CWHkm),]
-#1811 observations
+#28 obs
 
 panCWHJoin=left_join(panJoin,VilasCWHperKM,by="WBIC")
 panCWHJoin=panCWHJoin[!is.na(panCWHJoin$CWHkm),]
-#287 observations
+#12 obs
+
+#2001-2016 subset
+bassCWHJoin0116<-bassCWHJoin[bassCWHJoin$surveyYear>2000 & bassCWHJoin$surveyYear<2017,]
+#12 obs
+
+wallCWHJoin0116<-wallCWHJoin[wallCWHJoin$surveyYear>2000 & wallCWHJoin$surveyYear<2017,]
+#17 obs
+
+panCWHJoin0116<-panCWHJoin[panCWHJoin$surveyYear>2000 & panCWHJoin$surveyYear<2017,]
+#9 obs
+
+#2001-2004 subset
+bassCWHJoin0104<-bassCWHJoin[bassCWHJoin$surveyYear>2000 & bassCWHJoin$surveyYear<2005,]
+#1 obs
+
+wallCWHJoin0104<-wallCWHJoin[wallCWHJoin$surveyYear>2000 & wallCWHJoin$surveyYear<2005,]
+#2 obs
+
+panCWHJoin0104<-panCWHJoin[panCWHJoin$surveyYear>2000 & panCWHJoin$surveyYear<2005,]
+#2 obs
 
 #model fits
 #Bass
