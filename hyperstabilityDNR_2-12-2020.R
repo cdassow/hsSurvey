@@ -382,14 +382,42 @@ panbuildJoin=left_join(panJoin,buildDensity2018,by="WBIC")
 panbuildJoin=panbuildJoin[!is.na(panbuildJoin$buildingCount50m),]
 #44 observations
 
-#model fits
+#bringing in ntl building density data from 2001-2004
+NTLBuild<- read.csv("NTLBuildDensData(2001-2004).csv")
 
-fit4<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildingDensity200m)
+#fixing column names to join tables 
+NTLBuild$WBIC=NTLBuild$wbic
+NTLBuild$surveyYear=NTLBuild$survey_year
+NTLBuild<-NTLBuild[,c(1:4,8:34)]
+
+#joining building density to bass catch + abund info
+bassbuildJoin=left_join(bassJoin,NTLBuild, by="WBIC","surveyYear")
+bassbuildJoin=bassbuildJoin[!is.na(bassbuildJoin$buildings_per_km),]
+#only 24 observations left of 62
+
+#building density numbers for walleye lake yr observations
+wallbuildJoin=left_join(wallJoin,NTLBuild,by="WBIC","surveyYear")
+wallbuildJoin=wallbuildJoin[!is.na(wallbuildJoin$buildings_per_km),]
+#28 observations left of 62
+
+#builing density numbers for panfish lake yr observations
+panbuildJoin=left_join(panJoin,NTLBuild,by="WBIC","surveyYear")
+panbuildJoin=panbuildJoin[!is.na(panbuildJoin$buildings_per_km),]
+#only 12 observations left of 62
+
+#model fits building density from ntl
+
+fit4<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildings_per_km)
 summary(fit4)#nothing significant 
+
+fit4.1<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildings_per_km_quintile)
+summary(fit4.1)#small signif.
 
 #looking at residuals as a function of building density,look at relationship between beta and density
 VilasBassFit<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildingCount200m)
 plot(bassbuildJoin$buildingDensity200m,residuals(VilasBassFit))
+VilasBassFit<-glm(bassbuildJoin$logCPUE~bassbuildJoin$logAbun+bassbuildJoin$logAbun:bassbuildJoin$buildings_per_km_quintile)
+plot(bassbuildJoin$buildings_per_km_quintile,residuals(VilasBassFit))
 residuals(VilasBassFit)
 
 
@@ -397,12 +425,23 @@ fit5<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun+panbuildJoin$logAbun:panbuil
 summary(fit5)#look at p value
 VilasPanFit<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun)
 plot(panbuildJoin$buildingDensity200m,residuals(VilasPanFit))
+fit5<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun+panbuildJoin$logAbun:panbuildJoin$buildings_per_km)
+summary(fit5)#not significant
 
 fit6<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun+wallbuildJoin$logAbun:wallbuildJoin$buildingDensity200m)
 summary(fit6)#look at p value
 VilasWallFit<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun)
 plot(wallbuildJoin$buildingDensity200m,residuals(VilasWallFit), 
      main="relationship between walleye betas and building density", ylab="Residuals")
+fit5.1<-glm(panbuildJoin$logCPUE~panbuildJoin$logAbun+panbuildJoin$logAbun:panbuildJoin$buildings_per_km)
+summary(fit5.1)#not sig.
+
+fit6<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun+wallbuildJoin$logAbun:wallbuildJoin$buildings_per_km)
+summary(fit6)#not sig. netiher building quintile
+
+#VilasWallFit<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun)
+#plot(wallbuildJoin$buildingDensity200m,residuals(VilasWallFit), 
+#    main="relationship between walleye betas and building density", ylab="Residuals")
 
 #### Models with CWH density ####
 
@@ -524,6 +563,8 @@ summary(CWHkmWallFit)
 #Pan
 CWHkmPanFit<-glm(panCWHJoin$logCPUE~panCWHJoin$logAbun+panCWHJoin$logAbun:panCWHJoin$CWHkm)
 summary(CWHkmPanFit)
+
+#check year number for observations
 
 #look at the relationship with county
 library(ggplot2)
