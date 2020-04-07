@@ -430,41 +430,6 @@ panCWHJoin=left_join(panJoin,CWHdensity,by="WBIC")
 panCWHJoin=panCWHJoin[!is.na(panCWHJoin$Total.CWH.per.km.shoreline),]
 #only 12 big yikes
 
-#model fits, fix to plots with residuals and CWH interactions
-
-fit7<-glm(bassCWHJoin$logCPUE~bassCWHJoin$logAbun+bassCWHJoin$logAbun:bassCWHJoin$Total.CWH.per.km.shoreline)
-summary(fit7)#not significant
-CWHBassFit<-glm(bassbuildCWHJoin$logCPUE~bassbuildCWHJoin$logAbun)
-plot(bassbuildCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHBassFit))
-
-fit8<-glm(panCWHJoin$logCPUE~panCWHJoin$logAbun+panCWHJoin$logAbun:panCWHJoin$Total.CWH.per.km.shoreline)
-summary(fit8)#not significant
-CWHPanFit<-glm(panCWHJoin$logCPUE~panCWHJoin$logAbun)
-plot(panCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHPanFit))
-
-
-fit9<-glm(wallCWHJoin$logCPUE~wallCWHJoin$logAbun+wallCWHJoin$logAbun:wallCWHJoin$Total.CWH.per.km.shoreline)
-summary(fit9)#not significant 
-CWHWallFit<-glm(wallbuildCWHJoin$logCPUE~wallbuildCWHJoin$logAbun)
-plot(wallbuildCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHWallFit))
-  
-#bringing in coarse woody habitat estimates from Jake Ziegler data from YOY mort. study
-CWHdensity=gdriveURL("https://drive.google.com/open?id=1x1_JdeamiU2auqrlPQ3G_wA6Spuf0vwf")
-#only 61 observations*
-
-#seeing how many lake yr for a species have supplemental CWH denisty info
-bassCWHJoin=left_join(bassJoin,CWHdensity,by="WBIC")
-bassCWHJoin=bassCWHJoin[!is.na(bassCWHJoin$Total.CWH.per.km.shoreline),]
-
-#not all shoreline data points have wood data, still only 23 observations
-wallCWHJoin=left_join(wallJoin,CWHdensity,by="WBIC")
-wallCWHJoin=wallCWHJoin[!is.na(wallCWHJoin$Total.CWH.per.km.shoreline),]
-
-#only 27 observations for wall lakes with CWH density info
-panCWHJoin=left_join(panJoin,CWHdensity,by="WBIC")
-panCWHJoin=panCWHJoin[!is.na(panCWHJoin$Total.CWH.per.km.shoreline),]
-#only 12 big yikes
-
 #checking which lakes have CWH and buidling density info for a given species
 bassbuildCWHJoin=left_join(bassbuildJoin,CWHdensity,by="WBIC")
 bassbuildCWHJoin=bassbuildCWHJoin[!is.na(bassbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
@@ -500,6 +465,7 @@ plot(wallbuildCWHJoin$Total.CWH.per.km.shoreline,residuals(CWHWallFit))
 #https://lter.limnology.wisc.edu/dataset/biocomplexity-north-temperate-lakes-lter-coordinated-field-studies-riparian-plots-2001-2004
 #probably will stick with fishscapes buildin density + CWH data
 
+
 #bringing in CWH data from ntl data 2001-2004
 ntlCWH=read.csv("ntl125_2_v1_0.csv")
 
@@ -518,7 +484,11 @@ ntlCWH=ntlCWH[is.na(ntlCWH$numLog)==FALSE,]
 lakeCWH=aggregate(ntlCWH$numLog,by=list(lakename=ntlCWH$lakename),FUN=sum)
 
 ##using linfo to add WBICS to CWH counts
-lakeName<-linfo[,c(1,2,14)]
+linfo<-gdriveURL("https://drive.google.com/open?id=1ot9rEYnCG07p7aUxbeqN2mJ3cNrzYA0Y")
+linfo=linfo[,1:13]
+#check line to get all 3 columns
+lakeName<-linfo[,c(1:2,14)]
+
 lakeNameVilas<-lakeName[lakeName$county=="Vilas",]
 lakeNameVilas<-lakeNameVilas[,c(1,2)]
 colnames(lakeNameVilas)<-c("WBIC","lakename")
