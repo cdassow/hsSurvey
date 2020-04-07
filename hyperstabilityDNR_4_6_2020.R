@@ -198,6 +198,7 @@ bassJoin<- bassJoin[bassJoin$logCPUE!=-Inf,]
 
 wallJoin$logCPUE=log(wallJoin$meanCPUE)
 wallJoin$logAbun=log(wallJoin$meanEF_CPEkm)
+
 wallJoin<- wallJoin[wallJoin$logCPUE!=-Inf,]
 
 
@@ -407,9 +408,25 @@ summary(fit5.1)#not sig.
 fit6<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun+wallbuildJoin$logAbun:wallbuildJoin$buildings_per_km)
 summary(fit6)#not sig. netiher building quintile
 
-#VilasWallFit<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun)
-#plot(wallbuildJoin$buildingDensity200m,residuals(VilasWallFit), 
-#    main="relationship between walleye betas and building density", ylab="Residuals")
+#2001-2016 subset
+bassbuildJoin0116<-bassbuildJoin[bassbuildJoin$surveyYear.x>2000 & bassbuildJoin$surveyYear.x<2017,]
+#13 obs
+
+wallbuildJoin0116<-wallbuildJoin[wallbuildJoin$surveyYear.x>2000 & wallbuildJoin$surveyYear.x<2017,]
+#17 obs
+
+panbuildJoin0116<-panbuildJoin[panbuildJoin$surveyYear.x>2000 & panbuildJoin$surveyYear.x<2017,]
+#9 obs
+
+#2001-2004 subset
+bassbuildJoin0104<-bassbuildJoin[bassbuildJoin$surveyYear.x>2000 & bassbuildJoin$surveyYear.x<2005,]
+#1 obs
+
+wallbuildJoin0104<-wallbuildJoin[wallbuildJoin$surveyYear.x>2000 & wallbuildJoin$surveyYear.x<2005,]
+#2 obs
+
+panbuildJoin0104<-panbuildJoin[panbuildJoin$surveyYear.x>2000 & panbuildJoin$surveyYear.x<2005,]
+#2 obs
 
 ### Coarse woody Habitat ####
 
