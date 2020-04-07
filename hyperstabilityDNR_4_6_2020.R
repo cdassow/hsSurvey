@@ -359,8 +359,8 @@ hist(ps)
 
 ####Building Density ####
 
-#add in Building density *only for year 2018 
-buildDensity2018=gdriveURL("https://drive.google.com/open?id=11lPPduqiXIxz00fm6xxFzUA8u9nCOBnN")
+#add in Building density *only for year 2016
+buildDensity2016=gdriveURL("https://drive.google.com/open?id=11lPPduqiXIxz00fm6xxFzUA8u9nCOBnN")
 
 #bringing in ntl buidling info for 2001-2004
 NTLBuild<- read.csv("NTLBuildDensData(2001-2004).csv")
@@ -369,6 +369,19 @@ NTLBuild<- read.csv("NTLBuildDensData(2001-2004).csv")
 NTLBuild$WBIC=NTLBuild$wbic
 NTLBuild$surveyYear=NTLBuild$survey_year
 NTLBuild<-NTLBuild[,c(1:4,8:34)]
+
+#look at change in building density over time
+#calculating buildings per km for 2016 data
+buildDensity2016$buildings_per_km2016=buildDensity2016$buildingCount50m/(buildDensity2016$lakePerimeter_m*0.001)
+
+buildDensCompare=full_join(buildDensity2016,NTLBuild, by="WBIC")
+buildDensCompare=buildDensCompare[!is.na(buildDensCompare$buildings_per_km.y),]
+
+plot(x=buildDensCompare$buildings_per_km.y,y=buildDensCompare$buildings_per_km.x, xlab= "NTL estiamte (2001-2004)",
+     ylab="2016 estimate (GIS)", main="Lake building density comparison of different years")
+
+ggplot(data=buildDensCompare, aes(x=buildDensCompare$buildings_per_km.y,y=buildDensCompare$buildings_per_km.x))+geom_smooth()
+
 
 #joining building density to bass catch + abund info
 bassbuildJoin=left_join(bassJoin,NTLBuild, by="WBIC","surveyYear")
@@ -408,7 +421,7 @@ summary(fit5.1)#not sig.
 fit6<-glm(wallbuildJoin$logCPUE~wallbuildJoin$logAbun+wallbuildJoin$logAbun:wallbuildJoin$buildings_per_km)
 summary(fit6)#not sig. netiher building quintile
 
-#2001-2016 subset
+#2001-2016 subset-too small to even detect hyperstability
 bassbuildJoin0116<-bassbuildJoin[bassbuildJoin$surveyYear.x>2000 & bassbuildJoin$surveyYear.x<2017,]
 #13 obs
 
@@ -427,6 +440,7 @@ wallbuildJoin0104<-wallbuildJoin[wallbuildJoin$surveyYear.x>2000 & wallbuildJoin
 
 panbuildJoin0104<-panbuildJoin[panbuildJoin$surveyYear.x>2000 & panbuildJoin$surveyYear.x<2005,]
 #2 obs
+
 
 ### Coarse woody Habitat ####
 
