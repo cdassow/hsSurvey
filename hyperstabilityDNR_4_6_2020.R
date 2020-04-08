@@ -151,7 +151,6 @@ nrow(lake_yearWALLef)
 nrow(wallJoin)
 
 
-
 library(ggplot2)
 
 ####### Hyperstability (abund and CPUE plots) #####
