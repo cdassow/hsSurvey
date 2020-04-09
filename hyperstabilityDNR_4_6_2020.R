@@ -346,7 +346,7 @@ for(i in 1:1000){
   ps[i]=comp
 }
 plot(betas, ps)
-hist(betas, main = "walleye betas")
+hist(betas, main = "pan betas")
 hist(ps)
 
 
@@ -377,7 +377,7 @@ buildDensCompare=full_join(buildDensity2016,NTLBuild, by="WBIC")
 buildDensCompare=buildDensCompare[!is.na(buildDensCompare$buildings_per_km.y),]
 
 plot(x=buildDensCompare$buildings_per_km.y,y=buildDensCompare$buildings_per_km.x, xlab= "NTL estiamte (2001-2004)",
-     ylab="2016 estimate (GIS)", main="Lake building density comparison of different years")
+     ylab="2016 estimate (GIS)", main="Lake building density comparison of different years", xlim = )
 
 ggplot(data=buildDensCompare, aes(x=buildDensCompare$buildings_per_km.y,y=buildDensCompare$buildings_per_km.x))+geom_smooth()
 
