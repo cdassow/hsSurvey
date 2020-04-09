@@ -70,7 +70,8 @@ lake_yearCPUE=creel %>%
             N=n())
 lake_yearCPUE=as.data.frame(lake_yearCPUE)
 
-
+#Musky data, 20 counties 1995-2016
+Musk<-lake_yearCPUE[lake_yearCPUE$fishSpeciesCode=="L03",]
 
 ####### electrofishing abundance
 bassEF=gdriveURL("https://drive.google.com/open?id=11v8FbT2wnKx_CqUfxu_V9r_8fyCfcdD2")
