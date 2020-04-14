@@ -23,7 +23,7 @@ fish=fishS%>%
 
 
 #in-season database
-setwd("C:/Users/Camille/Documents/Fishscapes/")
+setwd("C:/Users/Camille/Desktop/Fishscapes/")
 source("schnabel.R")
 fishI.is=read.csv("fishInfoIS.csv")
 fishS.is=read.csv("fishSamplesIS.csv")
@@ -1659,8 +1659,10 @@ if(nrow(smb[smb$clipRecapture=="AF",])>5){
 
 ##### CPUE vs PE PLOTTING ####
 #lake perimeter info
-linfo=read.csv("C:/Users/jones/Box Sync/NDstuff/CNH/proposedFishScapeLakeList_20180627.csv", header = T, stringsAsFactors = F)
-linfo=linfo[linfo$lakeName%in%c("Hunter Lake", "Brandy Lake", "Day Lake", "Silver Lake", "Upper Gresham Lake"),]
+#linfo=read.csv("C:/Users/jones/Box Sync/NDstuff/CNH/proposedFishScapeLakeList_20180627.csv", header = T, stringsAsFactors = F)
+library(readxl)
+linfo <- read_excel("proposedFishScapeLakeList_20180627.xlsx")
+linfo=linfo[linfo$lakeName%in%c("Hunter Lake", "Brandy Lake", "Day Lake", "Silver Lake", "Upper Gresham Lake","White Birch"),]
 perm=c(linfo$lakePerimeter[1:2], 5310, linfo$lakePerimeter[3:4])
 
 #calculating shocking catch per mile
