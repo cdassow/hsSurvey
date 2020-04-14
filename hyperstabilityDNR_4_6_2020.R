@@ -151,6 +151,16 @@ nrow(panJoin)
 nrow(lake_yearWALLef)
 nrow(wallJoin)
 
+#creating csv with wbic and county for lakes we have fish data for, removed duplicate wbics
+HSwbic=lake_yearCPUE[,c(1,4)]
+HSwbic=distinct(HSwbic)
+write.csv(HSwbic,"HSwbic.csv")
+
+#list of Musky wbics, 113 Vilas, 53 Oneida
+MuskWBIC=Musk[,c(1,4)]
+MuskWBIC=distinct(MuskWBIC)
+write.csv(MuskWBIC,"Musky_WBICs_4-14-2020_HsSurvey.csv")
+
 
 library(ggplot2)
 
