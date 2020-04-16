@@ -31,8 +31,8 @@ setwd("~/Documents/Research/People/Students/current/Mosley_Camille/codeHelp/hype
 countyFiles=list.files()
 countyFiles=countyFiles[!grepl("x$",countyFiles)]
 
-# need list of wbics for each county...
-HSwbics=read.csv()
+# get list of wbics for each county
+HSwbics=read.csv("HSwbic.csv")
 
 # data frame to store output
 HSbuildingsSummary=data.frame(matrix(NA,nrow(HSwbics),10))
