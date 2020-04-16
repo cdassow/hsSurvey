@@ -36,7 +36,7 @@ HSwbics=read.csv("HSwbic.csv")
 
 # data frame to store output
 HSbuildingsSummary=data.frame(matrix(NA,nrow(HSwbics),10))
-colnames(buildingsSummary)=c('wbic','county','lakePerimeter_m','lakeArea_m2','buildingCount50m','buildingCount100m','buildingCount200m','buildingDensity50m','buildingDensity100m','buildingDensity200m')
+colnames(HSbuildingsSummary)=c('wbic','county','lakePerimeter_m','lakeArea_m2','buildingCount50m','buildingCount100m','buildingCount200m','buildingDensity50m','buildingDensity100m','buildingDensity200m')
 
 # loop through each county
 for(i in 1:length(countyFiles)){
