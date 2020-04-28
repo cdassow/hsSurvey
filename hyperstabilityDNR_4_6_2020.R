@@ -172,14 +172,14 @@ ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
 
 #smooth line making trendline of observations
 ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
-  geom_smooth(model=lm)
+  geom_smooth(model=lm)+xlab("Abundance (ef CPUE)")+ylab("Angling CPUE")
 #connecting with line 
 ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
   geom_line()
 
 #color coded by LMB or SMB
 ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
-  geom_point(aes(color=species))+theme(legend.position = "right")
+  geom_point(aes(color=species))+theme(legend.position = "right")+
 
 #ploting for walleye population
 ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
@@ -189,13 +189,15 @@ ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
   geom_line()
 
 ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
-  geom_point()
+  geom_point()+theme_classic()+xlab("Abundance (ef CPUE)")+ylab("Angling CPUE")+
+  ggtitle("Walleye Hyperstability observations")
 
 
 #plotting for panfish species
 
 ggplot(data=panJoin,aes(x=panJoin$meanEF_CPEkm,y=panJoin$meanCPUE))+
-  geom_point(aes(color=species))+theme(legend.position = "right")
+  geom_point(aes(color=species))+theme(legend.position = "right")+xlab("Abundance (ef CPUE)")+ylab("Angling CPUE")+
+  ggtitle("Panfish Hyperstability observations")
 
 ######## log values and model fits #######
 
@@ -324,7 +326,7 @@ plot(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2])
 
 ### Ploting hyperstability ###
 plot(x=1:165,y=exp(fit1$coefficients[1])*(1:165)^fit1$coefficients[2], col='blue', type = "l",ylim = c(0,5),
-     main = "Hyperstability of fish Species in WI")
+     main = "Hyperstability of fish Species in WI", xlab="Fish Abundance", ylab = "CPUE")
 lines(1:165,exp(fit2$coefficients[1])*(1:165)^fit2$coefficients[2],col="red")
 lines(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2],col="darkgreen")
 legend("topright",paste("Fit = ",c("LMB","Panfish","Walleye")), lty = 1:5, col = 1:5)
@@ -367,10 +369,83 @@ hist(ps)
 #lm(loganCPUE~logefCPUE*species), efCPUE + species + efCPUE:species
 #B0 + b1efCPUE + B2*species +B3efCPUE scpeies
 
-####Building Density ####
+####Building Density Using GIS files from WI Geo Database, (NTL database has a Vilas subset)####
+
+#add in Building density csv from GIS files from Hsbuild github repo on joneslabND
+buildDens<-read.csv("HSbuildingsSummary_yrs.csv")
+#formatting to join columns 
+buildDens$WBIC=buildDens$wbic
+buildDens=buildDens[,2:12]
+
+
+#join with fish-lake yr data
+Bassbuild=left_join(bassJoin, buildDens, by="WBIC","county")
+Bassbuild=Bassbuild[!is.na(Bassbuild$buildingCount100m),]
+Bassbuild=Bassbuild[!is.na(Bassbuild$meanEF_CPEkm),]
+#202 observations
+
+BassbuildFit<-glm(Bassbuild$logCPUE~Bassbuild$logAbun)
+summary(BassbuildFit)#hyperstabilty detected
+
+BassbuildFit200<-glm(Bassbuild$logCPUE~Bassbuild$logAbun+Bassbuild$logAbun:Bassbuild$buildingCount200m)
+summary(BassbuildFit200)
+
+#contstraining to 2006-2016, 98 obs
+BassbuildJoin=Bassbuild[Bassbuild$surveyYear.x>=2006,]
+
+BassbuildJFit<-glm(BassbuildJoin$logCPUE~BassbuildJoin$logAbun)
+summary(BassbuildJFit)#hyperstability detected
+
+BassbuildJFit50<-glm(BassbuildJoin$logCPUE~BassbuildJoin$logAbun+BassbuildJoin$logAbun:BassbuildJoin$buildingDensity200m)
+summary(BassbuildJFit50)
+
+#Walleye subset
+Wallbuild=left_join(wallJoin, buildDens, by="WBIC","county")
+Wallbuild=Wallbuild[!is.na(Wallbuild$buildingCount100m),]
+Wallbuild=Wallbuild[!is.na(Wallbuild$meanEF_CPEkm),]
+#198 observations
+
+WallbuildFit<-glm(Wallbuild$logCPUE~Wallbuild$logAbun)
+summary(WallbuildFit)#hyperstabilty detected
+
+WallbuildFit200<-glm(Wallbuild$logCPUE~Wallbuild$logAbun+Wallbuild$logAbun:Wallbuild$buildingDensity200m)
+summary(WallbuildFit200)#sig for all denisty m
+#contstraining to 2006-2016, 110 obs
+WallbuildJoin=Wallbuild[Wallbuild$surveyYear.x>=2006,]
+
+WallbuildJFit<-glm(WallbuildJoin$logCPUE~WallbuildJoin$logAbun)
+summary(WallbuildJFit)#hyperstability detected
+
+WallbuildJFit50<-glm(WallbuildJoin$logCPUE~WallbuildJoin$logAbun+WallbuildJoin$logAbun:WallbuildJoin$buildingDensity200m)
+summary(WallbuildJFit50)#sig for 100m and 200m density
+
+#Panfish subset
+Panbuild=left_join(panJoin, buildDens, by="WBIC","county")
+Panbuild=Panbuild[!is.na(Panbuild$buildingCount100m),]
+Panbuild=Panbuild[!is.na(Panbuild$meanEF_CPEkm),]
+#135 observations
+
+PanbuildFit<-glm(Panbuild$logCPUE~Panbuild$logAbun)
+summary(PanbuildFit)#hyperstabilty detected
+
+PanbuildFit50<-glm(Panbuild$logCPUE~Panbuild$logAbun+Panbuild$logAbun:Panbuild$buildingCount200m)
+summary(PanbuildFit50)#not sig
+
+#contstraining to 2006-2016, 95 obs
+PanbuildJoin=Panbuild[Panbuild$surveyYear.x>=2006,]
+
+PanbuildJFit<-glm(PanbuildJoin$logCPUE~PanbuildJoin$logAbun)
+summary(PanbuildJFit)#hyperstability detected
+
+PanbuildJFit50<-glm(PanbuildJoin$logCPUE~PanbuildJoin$logAbun+PanbuildJoin$logAbun:PanbuildJoin$buildingDensity200m)
+summary(PanbuildJFit50)#not sig
+
+###### NTL build comparison  #####
 
 #add in Building density *only for year 2016
 buildDensity2016=gdriveURL("https://drive.google.com/open?id=11lPPduqiXIxz00fm6xxFzUA8u9nCOBnN")
+
+bassbuild=left_join(buildDensity2016)
 
 #bringing in ntl buidling info for 2001-2004
 NTLBuild<- read.csv("NTLBuildDensData(2001-2004).csv")
@@ -385,12 +460,13 @@ NTLBuild<-NTLBuild[,c(1:4,8:34)]
 buildDensity2016$buildings_per_km2016=buildDensity2016$buildingCount50m/(buildDensity2016$lakePerimeter_m*0.001)
 
 buildDensCompare=full_join(buildDensity2016,NTLBuild, by="WBIC")
-buildDensCompare=buildDensCompare[!is.na(buildDensCompare$buildings_per_km.y),]
+buildDensCompare=buildDensCompare[!is.na(buildDensCompare$secchi),]
 
-plot(x=buildDensCompare$buildings_per_km.y,y=buildDensCompare$buildings_per_km.x, xlab= "NTL estiamte (2001-2004)",
-     ylab="2016 estimate (GIS)", main="Lake building density comparison of different years", xlim = )
+plot(x=buildDensCompare$buildings_per_km,y=buildDensCompare$buildings_per_km2016, xlab= "NTL estiamte (2001-2004)",
+     ylab="2016 estimate (GIS)", main="Lake building density comparison of different years")
 
-ggplot(data=buildDensCompare, aes(x=buildDensCompare$buildings_per_km.y,y=buildDensCompare$buildings_per_km.x))+geom_smooth()
+ggplot(data=buildDensCompare, aes(x=buildDensCompare$buildings_per_km,y=buildDensCompare$buildings_per_km2016))+geom_smooth()+
+  labs(x="NTL estiamte (2001-2004)", y="2016 estimate (GIS)", title= "Lake building density comparison of different years")
 
 
 #joining building density to bass catch + abund info
@@ -523,6 +599,8 @@ ntlCWH$numLog[is.na(ntlCWH$numLog)]=0
 
 #summing observations by lake name
 lakeCWH=aggregate(ntlCWH$numLog,by=list(lakename=ntlCWH$lakename),FUN=sum)
+
+##### Lake charactersitic models #####
 
 ##using linfo to add WBICS to CWH counts
 linfo<-gdriveURL("https://drive.google.com/open?id=1ot9rEYnCG07p7aUxbeqN2mJ3cNrzYA0Y")
@@ -770,3 +848,4 @@ LMBfit<-glm(LMB$distEffortkm~LMB$nHat)
 summary(LMBfit)
 
 #do not see any hyperstability present for obs, only few may be the reason
+
