@@ -332,6 +332,18 @@ lines(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2],col="darkgree
 legend("topright",paste("Fit = ",c("LMB","Panfish","Walleye")), lty = 1:5, col = 1:5)
 
 
+#combining all fish species to one lm
+
+BWJoin=full_join(bassJoin,wallJoin)
+BWPJoin=full_join(BWJoin,panJoin)
+
+BWPFit<-glm(BWPJoin$logCPUE~BWPJoin$logAbun)
+summary(BWPFit)
+
+BWPspeciesFit<-glm(BWPJoin$logCPUE~BWPJoin$logAbun*BWPJoin$species)
+summary(BWPspeciesFit)
+
+
 #using betaBootstrapping R script to calucate betas from model fit to simulated data
 
 ### Bootstrapping ####
@@ -388,7 +400,7 @@ BassbuildFit<-glm(Bassbuild$logCPUE~Bassbuild$logAbun)
 summary(BassbuildFit)#hyperstabilty detected
 
 BassbuildFit200<-glm(Bassbuild$logCPUE~Bassbuild$logAbun+Bassbuild$logAbun:Bassbuild$buildingCount200m)
-summary(BassbuildFit200)
+summary(BassbuildFit200)#not sig
 
 #contstraining to 2006-2016, 98 obs
 BassbuildJoin=Bassbuild[Bassbuild$surveyYear.x>=2006,]
@@ -397,7 +409,7 @@ BassbuildJFit<-glm(BassbuildJoin$logCPUE~BassbuildJoin$logAbun)
 summary(BassbuildJFit)#hyperstability detected
 
 BassbuildJFit50<-glm(BassbuildJoin$logCPUE~BassbuildJoin$logAbun+BassbuildJoin$logAbun:BassbuildJoin$buildingDensity200m)
-summary(BassbuildJFit50)
+summary(BassbuildJFit50)#not sig
 
 #Walleye subset
 Wallbuild=left_join(wallJoin, buildDens, by="WBIC","county")
@@ -416,8 +428,8 @@ WallbuildJoin=Wallbuild[Wallbuild$surveyYear.x>=2006,]
 WallbuildJFit<-glm(WallbuildJoin$logCPUE~WallbuildJoin$logAbun)
 summary(WallbuildJFit)#hyperstability detected
 
-WallbuildJFit50<-glm(WallbuildJoin$logCPUE~WallbuildJoin$logAbun+WallbuildJoin$logAbun:WallbuildJoin$buildingDensity200m)
-summary(WallbuildJFit50)#sig for 100m and 200m density
+WallbuildJFit100<-glm(WallbuildJoin$logCPUE~WallbuildJoin$logAbun+WallbuildJoin$logAbun:WallbuildJoin$buildingDensity100m)
+summary(WallbuildJFit100)#sig for 100m and 200m density
 
 #Panfish subset
 Panbuild=left_join(panJoin, buildDens, by="WBIC","county")
