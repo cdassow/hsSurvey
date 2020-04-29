@@ -612,8 +612,6 @@ ntlCWH$numLog[is.na(ntlCWH$numLog)]=0
 #summing observations by lake name
 lakeCWH=aggregate(ntlCWH$numLog,by=list(lakename=ntlCWH$lakename),FUN=sum)
 
-##### Lake charactersitic models #####
-
 ##using linfo to add WBICS to CWH counts
 linfo<-gdriveURL("https://drive.google.com/open?id=1ot9rEYnCG07p7aUxbeqN2mJ3cNrzYA0Y")
 linfo=linfo[,1:14]
@@ -702,6 +700,8 @@ panbuildCWHJoin=panbuildCWHJoin[!is.na(panbuildCWHJoin$CWH.greater.than.10cm.per
 wallbuildCWHJoin=left_join(wallbuildJoin,CWHdensity,by="WBIC")
 wallbuildCWHJoin=wallbuildCWHJoin[!is.na(wallbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
 #27 obs
+
+##### Lake charactersitic models #####
 
 #add in lake characterisitcs
 linfo<-gdriveURL("https://drive.google.com/open?id=1ot9rEYnCG07p7aUxbeqN2mJ3cNrzYA0Y")
