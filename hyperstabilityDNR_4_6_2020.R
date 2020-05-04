@@ -411,6 +411,9 @@ summary(BassbuildJFit)#hyperstability detected
 BassbuildJFit50<-glm(BassbuildJoin$logCPUE~BassbuildJoin$logAbun+BassbuildJoin$logAbun:BassbuildJoin$buildingDensity200m)
 summary(BassbuildJFit50)#not sig
 
+SpeciesBuildB<-glm(BassbuildJoin$logCPUE~BassbuildJoin$logAbun+BassbuildJoin$logAbun:BassbuildJoin$buildingDensity200m*BassbuildJoin$species)
+summary(SpeciesBuildB)
+
 #Walleye subset
 Wallbuild=left_join(wallJoin, buildDens, by="WBIC","county")
 Wallbuild=Wallbuild[!is.na(Wallbuild$buildingCount100m),]
@@ -430,6 +433,9 @@ summary(WallbuildJFit)#hyperstability detected
 
 WallbuildJFit100<-glm(WallbuildJoin$logCPUE~WallbuildJoin$logAbun+WallbuildJoin$logAbun:WallbuildJoin$buildingDensity100m)
 summary(WallbuildJFit100)#sig for 100m and 200m density
+
+SpeciesBuildW<-glm(WallbuildJoin$logCPUE~WallbuildJoin$logAbun+WallbuildJoin$logAbun:WallbuildJoin$buildingDensity200m*WallbuildJoin$species)
+summary(SpeciesBuildW)#error in contrasts, can be applied only to factors with 2 or more levels
 
 #Panfish subset
 Panbuild=left_join(panJoin, buildDens, by="WBIC","county")
@@ -451,6 +457,9 @@ summary(PanbuildJFit)#hyperstability detected
 
 PanbuildJFit50<-glm(PanbuildJoin$logCPUE~PanbuildJoin$logAbun+PanbuildJoin$logAbun:PanbuildJoin$buildingDensity200m)
 summary(PanbuildJFit50)#not sig
+
+SpeciesBuildP<-glm(PanbuildJoin$logCPUE~PanbuildJoin$logAbun+PanbuildJoin$logAbun:PanbuildJoin$buildingDensity200m*PanbuildJoin$species)
+summary(SpeciesBuildP)
 
 ###### NTL build comparison  #####
 
