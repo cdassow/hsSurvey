@@ -232,7 +232,7 @@ panJoin$PE.lcl=panJoin$std-panJoin$meanCPUE
 #join tables to compare species with lm model
 LMBplusWall=rbind(bassJoin[bassJoin$species=="LARGEMOUTH BASS",],wallJoin)
 #generate linear model to compare hyperstability of 
-LMBvsWall<-lm(LMBplusWall$logCPUE~LMBplusWall$logAbun*LMBplusWall$species)
+LMBvsWall<-lm(LMBplusWall$logCPUE~LMBplusWall$logAbun+LMBplusWall$logAbun:LMBplusWall$species)
 summary(LMBvsWall)
 #Walleye statistically significant different from LMB hyperstability similar lines on fit
 
@@ -318,6 +318,7 @@ summary(fit3)
 #ploting model with fit line bass log transformed abund. and CPUE
 plot(x=wallJoin$logAbun,y=wallJoin$logCPUE)
 abline(fit3)
+
 
 #normal spcae plot of model fit to the data, exponential(intercept)*x^slope this is qN^B
 #coefficients 2 is beta
