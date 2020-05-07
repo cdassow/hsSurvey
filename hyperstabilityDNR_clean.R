@@ -166,6 +166,19 @@ summary(BWPFit)#beta less than 1 hyperstable, signficant
 BWPspeciesFit<-lm(BWPJoin$logCPUE~BWPJoin$logAbun+BWPJoin$logAbun:BWPJoin$species)
 summary(BWPspeciesFit)#signficantly different slopes/betas, species relationship with hyperstability present
 
+#general linear model for bass, using lm function 
+fit1<-lm(bassJoin$logCPUE~bassJoin$logAbun)
+summary(fit1)
+
+
+#model for panfish
+fit2<-lm(panJoin$logCPUE~panJoin$logAbun)
+summary(fit2)
+
+# model for walleye
+fit3<-lm(wallJoin$logCPUE~wallJoin$logAbun)
+summary(fit3)
+
 
 ### Build Density relationship with hyperstability ####
 
@@ -339,8 +352,24 @@ ggplotRegression <- function (fit) {
 ggplotRegression(lm(wallJoin$logCPUE~wallJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
                                                                              title = "Walleye linear model fit of catch vs abundance")
 
-ggplotRegression(lm(bassJoin$logCPUE~bassJoin$logAbun, data= bassJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+#ggplotRegression(lm(bassJoin$logCPUE~bassJoin$logAbun, data= bassJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
                                                                              title = "Bass linear model fit of catch vs abundance")
 
 ggplotRegression(lm(panJoin$logCPUE~panJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
                                                                            title = "Panfish linear model fit of catch vs abundance")
+title = "Walleye linear model fit of catch vs abundance correlated with buidling density")
+
+#looking at different number of obs per species
+ggplot(BWPJoin, aes(x=meanEF_CPEkm, y=meanCPUE))+geom_point(aes(col=species))+facet_wrap(vars(species))+labs(x="Fish density (efCPUE)", y="Angling CPUE", title = "Catch rate vs Abundance observations by species")
+
+#looking at different number of observations over the years
+ggplot(BWPJoin, aes(x=meanEF_CPEkm, y=meanCPUE))+geom_point()+facet_wrap(vars(surveyYear))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                                                title = "Wisconsin DNR fish data CPUE calculations from 1995-2016")
+#plotting fits of all the different species together
+plot(x=1:165,y=exp(fit1$coefficients[1])*(1:165)^fit1$coefficients[2], col='blue', type = "l",ylim = c(0,5),
+     main = "Hyperstability of fish Species in WI", xlab="Fish Abundance (efCPUE)", ylab = "Angling CPUE")
+lines(1:165,exp(fit2$coefficients[1])*(1:165)^fit2$coefficients[2],col="red")
+lines(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2],col="darkgreen")
+legend("topright",paste("Fit = ",c("LMB","Panfish","Walleye")), lty = 1:5, col = 1:5)
+
+

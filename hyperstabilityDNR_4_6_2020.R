@@ -349,8 +349,8 @@ ggplotRegression <- function (fit) {
 ggplotRegression(lm(wallJoin$logCPUE~wallJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
                                                                              title = "Walleye linear model fit of catch vs abundance")
 
-ggplotRegression(lm(bassJoin$logCPUE~bassJoin$logAbun, data= bassJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
-                                                                             title = "Bass linear model fit of catch vs abundance")
+#ggplotRegression(lm(bassJoin$logCPUE~bassJoin$logAbun, data= bassJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                            # title = "Bass linear model fit of catch vs abundance")
 
 ggplotRegression(lm(panJoin$logCPUE~panJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
                                                                              title = "Panfish linear model fit of catch vs abundance")
@@ -358,11 +358,12 @@ ggplotRegression(lm(panJoin$logCPUE~panJoin$logAbun, data= wallJoin))+labs(x="Fi
 ggplotRegression(lm(Wallbuild$logCPUE~Wallbuild$logAbun+Wallbuild$logAbun:Wallbuild$buildingDensity200m))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
                                                                                                                title = "Walleye linear model fit of catch vs abundance correlated with buidling density")
 #looking at different number of obs per species
-ggplot(BWPJoin, aes(x=meanEF_CPEkm, y=meanCPUE))+geom_point()+facet_grid(cols=vars(species))
+ggplot(BWPJoin, aes(x=meanEF_CPEkm, y=meanCPUE))+geom_point(aes(col=species))+facet_wrap(vars(species))+labs(x="Fish density (efCPUE)", y="Angling CPUE", title = "Catch rate vs Abundance observations by species")
 
 #looking at different number of observations over the years
 ggplot(BWPJoin, aes(x=meanEF_CPEkm, y=meanCPUE))+geom_point()+facet_wrap(vars(surveyYear))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
                                                                                                  title = "Wisconsin DNR fish data CPUE calculations from 1995-2016")
+
 
 plot(x=1:165,y=exp(fit1$coefficients[1])*(1:165)^fit1$coefficients[2], col='blue', type = "l",ylim = c(0,5),
      main = "Hyperstability of fish Species in WI", xlab="Fish Abundance", ylab = "CPUE")
