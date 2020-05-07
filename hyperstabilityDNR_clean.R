@@ -71,9 +71,6 @@ lake_yearCPUE=creel %>%
             N=n())
 lake_yearCPUE=as.data.frame(lake_yearCPUE)
 
-#Musky data, 20 counties 1995-2016
-Musk<-lake_yearCPUE[lake_yearCPUE$fishSpeciesCode=="L03",]
-
 ####### electrofishing abundance
 bassEF=gdriveURL("https://drive.google.com/open?id=11v8FbT2wnKx_CqUfxu_V9r_8fyCfcdD2")
 bassEF=bassEF[,c(1,3,5,13,19,27:29)]
@@ -323,3 +320,27 @@ summary(NTLfit)#no significant change in beta
 
 
 ### Figures ####
+
+#function to pull data from linear regression and return key values 
+ggplotRegression <- function (fit) {
+  
+  require(ggplot2)
+  
+  ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
+    geom_point() +
+    stat_smooth(method = "lm", col = "red") +
+    labs(title = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
+                       "Intercept =",signif(fit$coef[[1]],5 ),
+                       " Slope =",signif(fit$coef[[2]], 5),
+                       " P =",signif(summary(fit)$coef[2,4], 5)))
+}
+
+#linear regression plots of catach vs abundance for walleye, bass, and Panfish
+ggplotRegression(lm(wallJoin$logCPUE~wallJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                             title = "Walleye linear model fit of catch vs abundance")
+
+ggplotRegression(lm(bassJoin$logCPUE~bassJoin$logAbun, data= bassJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                             title = "Bass linear model fit of catch vs abundance")
+
+ggplotRegression(lm(panJoin$logCPUE~panJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                           title = "Panfish linear model fit of catch vs abundance")

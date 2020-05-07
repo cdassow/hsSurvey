@@ -247,8 +247,13 @@ PanvsWall<-lm(PanplusWall$logCPUE~PanplusWall$logAbun+PanplusWall$logAbun:Panplu
 summary(PanvsWall)
 
 #general linear model for bass, using glm function 
-fit1<-glm(bassJoin$logCPUE~bassJoin$logAbun)
+fit1<-lm(bassJoin$logCPUE~bassJoin$logAbun)
 summary(fit1)
+
+plot(bassJoin$logCPUE~bassJoin$logAbun, data = bassJoin)
+abline(fit1)
+
+ggplot(bassJoin, aes(x=logAbun,y=logCPUE))+geom_point()+stat_smooth(method="lm", col="blue")
 
 LMBvsSMB<-lm(bassJoin$logCPUE~bassJoin$logAbun+bassJoin$logAbun:bassJoin$species)
 summary(LMBvsSMB)
@@ -272,9 +277,8 @@ plot(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE)
 plot(1:65,exp(fit1$coefficients[1])*(1:65)^fit1$coefficients[2], ylab="logCPUE (angling CPUE)", xlab="logAbun (efCPUE)", main = "Hyperstability of bass ")
 #can use lines function as well
 
-ggplot(bassJoin,aes(bassJoin$meanEF_CPEkm,bassJoin$meanCPUE))+
+ggplot(bassJoin,aes(meanEF_CPEkm,meanCPUE))+
   geom_point(aes(colour = surveyYear))
-ggplot(fit1,aes(bassJoin$meanEF_CPEkm,bassJoin$meanCPUE))+geom_smooth(model=lm)
 
 #model for panfish, fit summary estimate 0.23189 
 fit2<-glm(panJoin$logCPUE~panJoin$logAbun)
@@ -325,7 +329,41 @@ abline(fit3)
 plot(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE)
 plot(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2])
 
-### Ploting hyperstability ###
+##### Ploting hyperstability #####
+
+#function to pull data from linear regression and return key values from Susan Johnston lab(Institute of Evolutionary Biology at the University of Edinburgh)
+ggplotRegression <- function (fit) {
+  
+  require(ggplot2)
+  
+  ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
+    geom_point() +
+    stat_smooth(method = "lm", col = "red") +
+    labs(subtitle = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
+                       "Intercept =",signif(fit$coef[[1]],5 ),
+                       " Slope =",signif(fit$coef[[2]], 5),
+                       " P =",signif(summary(fit)$coef[2,4], 5)))
+}
+
+#linear regression plots of catach vs abundance for walleye, bass, and Panfish
+ggplotRegression(lm(wallJoin$logCPUE~wallJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                             title = "Walleye linear model fit of catch vs abundance")
+
+ggplotRegression(lm(bassJoin$logCPUE~bassJoin$logAbun, data= bassJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                             title = "Bass linear model fit of catch vs abundance")
+
+ggplotRegression(lm(panJoin$logCPUE~panJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                             title = "Panfish linear model fit of catch vs abundance")
+
+ggplotRegression(lm(Wallbuild$logCPUE~Wallbuild$logAbun+Wallbuild$logAbun:Wallbuild$buildingDensity200m))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                                                               title = "Walleye linear model fit of catch vs abundance correlated with buidling density")
+#looking at different number of obs per species
+ggplot(BWPJoin, aes(x=meanEF_CPEkm, y=meanCPUE))+geom_point()+facet_grid(cols=vars(species))
+
+#looking at different number of observations over the years
+ggplot(BWPJoin, aes(x=meanEF_CPEkm, y=meanCPUE))+geom_point()+facet_wrap(vars(surveyYear))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                                                 title = "Wisconsin DNR fish data CPUE calculations from 1995-2016")
+
 plot(x=1:165,y=exp(fit1$coefficients[1])*(1:165)^fit1$coefficients[2], col='blue', type = "l",ylim = c(0,5),
      main = "Hyperstability of fish Species in WI", xlab="Fish Abundance", ylab = "CPUE")
 lines(1:165,exp(fit2$coefficients[1])*(1:165)^fit2$coefficients[2],col="red")
@@ -338,7 +376,7 @@ legend("topright",paste("Fit = ",c("LMB","Panfish","Walleye")), lty = 1:5, col =
 BWJoin=full_join(bassJoin,wallJoin)
 BWPJoin=full_join(BWJoin,panJoin)
 
-BWPFit<-glm(BWPJoin$logCPUE~BWPJoin$logAbun)
+BWPFit<-lm(BWPJoin$logCPUE~BWPJoin$logAbun)
 summary(BWPFit)
 
 BWPspeciesFit<-lm(BWPJoin$logCPUE~BWPJoin$logAbun+BWPJoin$logAbun:BWPJoin$species)
