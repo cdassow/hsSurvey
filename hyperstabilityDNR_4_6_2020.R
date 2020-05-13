@@ -119,6 +119,10 @@ lake_yearWALLef= walleyeEF %>%
             N=n())
 lake_yearWALLef=as.data.frame(lake_yearWALLef)
 
+#bringing in walleye PEs from 2016 DNR survey to check efCPUE proxy for fish density 
+WalleyePE_2016=gdriveURL("https://drive.google.com/open?id=18e5zP5e5PuuCbeN0ShlWFMlcPgAbB4TV")
+WalleyePE_2016<-rename(WalleyePE_2016, WBIC=ï.., MWBC=X , county=X.1, Lake=X.2,acres=X.3, surveyYear=X.4, adultwalleyePop=X.6, WalleyeDensity=X.7)
+WalleyePE_2016<-WalleyePE_2016[2:152,c(1:6,8:9)]
 
 ##### merge data sets from angling CPUE and electrofishing CPUE to get exact lake-year matches
 # convert fishSpeciesCode in lake_yearCPUE to species (name from ef stuff)
@@ -350,7 +354,7 @@ ggplotRegression(lm(wallJoin$logCPUE~wallJoin$logAbun, data= wallJoin))+labs(x="
                                                                              title = "Walleye linear model fit of catch vs abundance")
 
 #ggplotRegression(lm(bassJoin$logCPUE~bassJoin$logAbun, data= bassJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
-                                                                            # title = "Bass linear model fit of catch vs abundance")
+                                                                             title = "Bass linear model fit of catch vs abundance")
 
 ggplotRegression(lm(panJoin$logCPUE~panJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
                                                                              title = "Panfish linear model fit of catch vs abundance")
