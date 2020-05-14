@@ -124,6 +124,13 @@ WalleyePE_2016=gdriveURL("https://drive.google.com/open?id=18e5zP5e5PuuCbeN0ShlW
 WalleyePE_2016<-rename(WalleyePE_2016, WBIC=ï.., MWBC=X , county=X.1, Lake=X.2,acres=X.3, surveyYear=X.4, adultwalleyePop=X.6, WalleyeDensity=X.7)
 WalleyePE_2016<-WalleyePE_2016[2:152,c(1:6,8:9)]
 
+#WalleyePE_2016$surveyYear<-as.numeric(WalleyePE_2016$surveyYear)
+#WalleyePE_2016$WBIC<-as.numeric(WalleyePE_2016$WBIC)
+
+#join walleye PE data with efCPUE walleye data, values in PE_2016 are integers
+#WallPE<-left_join(lake_yearWALLef,WalleyePE_2016,by=c("WBIC","surveyYear"))
+#WallPE<-WallPE[!is.na(WallPE$WalleyeDensity),]
+
 ##### merge data sets from angling CPUE and electrofishing CPUE to get exact lake-year matches
 # convert fishSpeciesCode in lake_yearCPUE to species (name from ef stuff)
 lake_yearCPUE$species=""
@@ -210,6 +217,7 @@ ggplot(data=panJoin,aes(x=panJoin$meanEF_CPEkm,y=panJoin$meanCPUE))+
 bassJoin$logCPUE=log(bassJoin$meanCPUE)
 bassJoin$logAbun=log(bassJoin$meanEF_CPEkm)
 bassJoin<- bassJoin[is.na(bassJoin$logCPUE)==F,]
+bassJoin<- bassJoin[is.na(bassJoin$logAbun)==F,]
 bassJoin<- bassJoin[bassJoin$logCPUE!=-Inf,]
 
 wallJoin$logCPUE=log(wallJoin$meanCPUE)
@@ -353,7 +361,7 @@ ggplotRegression <- function (fit) {
 ggplotRegression(lm(wallJoin$logCPUE~wallJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
                                                                              title = "Walleye linear model fit of catch vs abundance")
 
-#ggplotRegression(lm(bassJoin$logCPUE~bassJoin$logAbun, data= bassJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+ggplotRegression(lm(bassJoin$logCPUE~bassJoin$logAbun, data= bassJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
                                                                              title = "Bass linear model fit of catch vs abundance")
 
 ggplotRegression(lm(panJoin$logCPUE~panJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",

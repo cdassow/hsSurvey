@@ -152,6 +152,21 @@ nrow(wallJoin)
 
 ### Quantifying hyperstability ####
 
+#creating log CPUE and log N columns, removing na's and infinite values so glm can run and we can make fit
+bassJoin$logCPUE=log(bassJoin$meanCPUE)
+bassJoin$logAbun=log(bassJoin$meanEF_CPEkm)
+bassJoin<- bassJoin[is.na(bassJoin$logCPUE)==F,]
+bassJoin<- bassJoin[is.na(bassJoin$logAbun)==F,]
+bassJoin<- bassJoin[bassJoin$logCPUE!=-Inf,]
+
+wallJoin$logCPUE=log(wallJoin$meanCPUE)
+wallJoin$logAbun=log(wallJoin$meanEF_CPEkm)
+wallJoin<- wallJoin[wallJoin$logCPUE!=-Inf,]
+
+panJoin$logCPUE=log(panJoin$meanCPUE)
+panJoin$logAbun=log(panJoin$meanEF_CPEkm)
+panJoin<- panJoin[panJoin$logCPUE!=-Inf,]
+
 
 #combining all fish species to one lm
 
@@ -352,13 +367,12 @@ ggplotRegression <- function (fit) {
 ggplotRegression(lm(wallJoin$logCPUE~wallJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
                                                                              title = "Walleye linear model fit of catch vs abundance")
 
-#ggplotRegression(lm(bassJoin$logCPUE~bassJoin$logAbun, data= bassJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+ggplotRegression(lm(bassJoin$logCPUE~bassJoin$logAbun, data= bassJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
                                                                              title = "Bass linear model fit of catch vs abundance")
 
 ggplotRegression(lm(panJoin$logCPUE~panJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
-                                                                           title = "Panfish linear model fit of catch vs abundance")
-title = "Walleye linear model fit of catch vs abundance correlated with buidling density")
-
+                                                                           title = "Panfish linear model fit of catch vs abundance")+
+  
 #looking at different number of obs per species
 ggplot(BWPJoin, aes(x=meanEF_CPEkm, y=meanCPUE))+geom_point(aes(col=species))+facet_wrap(vars(species))+labs(x="Fish density (efCPUE)", y="Angling CPUE", title = "Catch rate vs Abundance observations by species")
 
