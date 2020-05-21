@@ -126,14 +126,45 @@ WalleyePE_2016<-WalleyePE_2016[2:152,c(2:6,8:9)]
 
 WalleyePE_2016$surveyYear<-as.numeric(WalleyePE_2016$surveyYear)
 WalleyePE_2016$WBIC<-as.numeric(WalleyePE_2016$WBIC)
+WalleyePE_2016$WalleyeDensity<-as.numeric(WalleyePE_2016$WalleyeDensity)
+WalleyePE_2016$adultwalleyePop<-as.numeric(WalleyePE_2016$adultwalleyePop)
 
 #join walleye PE data with efCPUE walleye data, values in PE_2016 are integers
 WallPE<-full_join(lake_yearWALLef,WalleyePE_2016,by=c("WBIC","surveyYear"))
 WallPE<-WallPE[!is.na(WallPE$WalleyeDensity),]
 
+#log Transform 
+woTurtles$logCPUE=log(woTurtles$meanEF_CPEkm)
+woTurtles$logAbun=log(woTurtles$adultwalleyePop)
+woTurtles$logDens=log(woTurtles$WalleyeDensity)
+
+fit1<-glm(WallPE$logCPUE~WallPE$logAbun)
+summary(fit1)
+
+fit2<-glm(woTurtles$logCPUE~woTurtles$logAbun)
+summary(fit2)
+
+fit3<-glm(woTurtles$logCPUE~woTurtles$logDens)
+summary(fit3)
+
+plot(fit1)
+
+plot(x=WallPE$logAbun,y=WallPE$logCPUE)
+abline(fit1)
+
+plot(x=woTurtles$adultwalleyePop,y=woTurtles$meanEF_CPEkm)
+
+woTurtles<-WallPE[WallPE$adultwalleyePop<30000,]
+
+library(ggplot2)
+
+ggplot(data = woTurtles, aes(x=adultwalleyePop, y=meanEF_CPEkm))+geom_point()
+ggplot(data = woTurtles, aes(x=logAbun, y=logCPUE))+geom_smooth(method="lm")
+
 ##### merge data sets from angling CPUE and electrofishing CPUE to get exact lake-year matches
 # convert fishSpeciesCode in lake_yearCPUE to species (name from ef stuff)
 lake_yearCPUE$species=""
+
 lake_yearCPUE$species[lake_yearCPUE$fishSpeciesCode=="X22"]="WALLEYE"
 lake_yearCPUE$species[lake_yearCPUE$fishSpeciesCode=="W11"]="SMALLMOUTH BASS"
 lake_yearCPUE$species[lake_yearCPUE$fishSpeciesCode=="W12"]="LARGEMOUTH BASS"
