@@ -121,15 +121,15 @@ lake_yearWALLef=as.data.frame(lake_yearWALLef)
 
 #bringing in walleye PEs from 2016 DNR survey to check efCPUE proxy for fish density 
 WalleyePE_2016=gdriveURL("https://drive.google.com/open?id=18e5zP5e5PuuCbeN0ShlWFMlcPgAbB4TV")
-WalleyePE_2016<-rename(WalleyePE_2016, WBIC=ï.., MWBC=X , county=X.1, Lake=X.2,acres=X.3, surveyYear=X.4, adultwalleyePop=X.6, WalleyeDensity=X.7)
-WalleyePE_2016<-WalleyePE_2016[2:152,c(1:6,8:9)]
+WalleyePE_2016<-rename(WalleyePE_2016, WBIC=ï.., WBIC=X , county=X.1, Lake=X.2,acres=X.3, surveyYear=X.4, adultwalleyePop=X.6, WalleyeDensity=X.7)
+WalleyePE_2016<-WalleyePE_2016[2:152,c(2:6,8:9)]
 
-#WalleyePE_2016$surveyYear<-as.numeric(WalleyePE_2016$surveyYear)
-#WalleyePE_2016$WBIC<-as.numeric(WalleyePE_2016$WBIC)
+WalleyePE_2016$surveyYear<-as.numeric(WalleyePE_2016$surveyYear)
+WalleyePE_2016$WBIC<-as.numeric(WalleyePE_2016$WBIC)
 
 #join walleye PE data with efCPUE walleye data, values in PE_2016 are integers
-#WallPE<-left_join(lake_yearWALLef,WalleyePE_2016,by=c("WBIC","surveyYear"))
-#WallPE<-WallPE[!is.na(WallPE$WalleyeDensity),]
+WallPE<-full_join(lake_yearWALLef,WalleyePE_2016,by=c("WBIC","surveyYear"))
+WallPE<-WallPE[!is.na(WallPE$WalleyeDensity),]
 
 ##### merge data sets from angling CPUE and electrofishing CPUE to get exact lake-year matches
 # convert fishSpeciesCode in lake_yearCPUE to species (name from ef stuff)
