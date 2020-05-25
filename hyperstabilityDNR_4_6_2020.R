@@ -121,7 +121,7 @@ lake_yearWALLef=as.data.frame(lake_yearWALLef)
 
 #bringing in walleye PEs from 2016 DNR survey to check efCPUE proxy for fish density 
 WalleyePE_2016=gdriveURL("https://drive.google.com/open?id=18e5zP5e5PuuCbeN0ShlWFMlcPgAbB4TV")
-WalleyePE_2016<-rename(WalleyePE_2016, WBIC=ï.., WBIC=X , county=X.1, Lake=X.2,acres=X.3, surveyYear=X.4, adultwalleyePop=X.6, WalleyeDensity=X.7)
+WalleyePE_2016<-rename(WalleyePE_2016, WBICdate=ï.., WBIC=X , county=X.1, Lake=X.2, acres=X.3, surveyYear=X.4, adultwalleyePop=X.6, WalleyeDensity=X.7)
 WalleyePE_2016<-WalleyePE_2016[2:152,c(2:6,8:9)]
 
 WalleyePE_2016$surveyYear<-as.numeric(WalleyePE_2016$surveyYear)
@@ -132,6 +132,9 @@ WalleyePE_2016$adultwalleyePop<-as.numeric(WalleyePE_2016$adultwalleyePop)
 #join walleye PE data with efCPUE walleye data, values in PE_2016 are integers
 WallPE<-full_join(lake_yearWALLef,WalleyePE_2016,by=c("WBIC","surveyYear"))
 WallPE<-WallPE[!is.na(WallPE$WalleyeDensity),]
+
+woTurtles<-WallPE[WallPE$adultwalleyePop<30000,]
+
 
 #log Transform 
 woTurtles$logCPUE=log(woTurtles$meanEF_CPEkm)
@@ -154,12 +157,11 @@ abline(fit1)
 
 plot(x=woTurtles$adultwalleyePop,y=woTurtles$meanEF_CPEkm)
 
-woTurtles<-WallPE[WallPE$adultwalleyePop<30000,]
 
 library(ggplot2)
 
-ggplot(data = woTurtles, aes(x=adultwalleyePop, y=meanEF_CPEkm))+geom_point()
-ggplot(data = woTurtles, aes(x=logAbun, y=logCPUE))+geom_smooth(method="lm")
+ggplot(data = woTurtles, aes(x=WalleyeDensity, y=meanEF_CPEkm))+geom_point()
+ggplot(data = woTurtles, aes(x=logDens, y=logCPUE))+geom_smooth(method="lm")
 
 ##### merge data sets from angling CPUE and electrofishing CPUE to get exact lake-year matches
 # convert fishSpeciesCode in lake_yearCPUE to species (name from ef stuff)
@@ -222,9 +224,9 @@ ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
 #color coded by LMB or SMB
 ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
   geom_point(aes(color=species))+theme(legend.position = "right")+
-
-#ploting for walleye population
-ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
+  
+  #ploting for walleye population
+  ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
   geom_smooth(model=lm)
 
 ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
@@ -383,9 +385,9 @@ ggplotRegression <- function (fit) {
     geom_point() +
     stat_smooth(method = "lm", col = "red") +
     labs(subtitle = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
-                       "Intercept =",signif(fit$coef[[1]],5 ),
-                       " Slope =",signif(fit$coef[[2]], 5),
-                       " P =",signif(summary(fit)$coef[2,4], 5)))
+                          "Intercept =",signif(fit$coef[[1]],5 ),
+                          " Slope =",signif(fit$coef[[2]], 5),
+                          " P =",signif(summary(fit)$coef[2,4], 5)))
 }
 
 #linear regression plots of catach vs abundance for walleye, bass, and Panfish
@@ -396,7 +398,7 @@ ggplotRegression(lm(bassJoin$logCPUE~bassJoin$logAbun, data= bassJoin))+labs(x="
                                                                              title = "Bass linear model fit of catch vs abundance")
 
 ggplotRegression(lm(panJoin$logCPUE~panJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
-                                                                             title = "Panfish linear model fit of catch vs abundance")
+                                                                           title = "Panfish linear model fit of catch vs abundance")
 
 ggplotRegression(lm(Wallbuild$logCPUE~Wallbuild$logAbun+Wallbuild$logAbun:Wallbuild$buildingDensity200m))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
                                                                                                                title = "Walleye linear model fit of catch vs abundance correlated with buidling density")
@@ -405,7 +407,7 @@ ggplot(BWPJoin, aes(x=meanEF_CPEkm, y=meanCPUE))+geom_point(aes(col=species))+fa
 
 #looking at different number of observations over the years
 ggplot(BWPJoin, aes(x=meanEF_CPEkm, y=meanCPUE))+geom_point()+facet_wrap(vars(surveyYear))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
-                                                                                                 title = "Wisconsin DNR fish data CPUE calculations from 1995-2016")
+                                                                                                title = "Wisconsin DNR fish data CPUE calculations from 1995-2016")
 
 
 plot(x=1:165,y=exp(fit1$coefficients[1])*(1:165)^fit1$coefficients[2], col='blue', type = "l",ylim = c(0,5),
@@ -470,7 +472,7 @@ hist(ps)
 buildDens<-read.csv("HSbuildingsSummary_yrs.csv")
 #formatting to join columns 
 buildDens$WBIC=buildDens$wbic
-buildDens=buildDens[,2:12]
+buildDens=buildDens[,c(2:11,13)]
 
 
 #join with fish-lake yr data for all species
@@ -486,7 +488,7 @@ summary(BWPbuildFit)
 
 #relationship between catch abun building density and species 
 BWPbuildspecies<-glm(BWPbuild$logCPUE~BWPbuild$logAbun+BWPbuild$logAbun:BWPbuild$species+BWPbuild$logAbun:BWPbuild$buildingDensity200m+
-  BWPbuild$logAbun:BWPbuild$species:BWPbuild$buildingDensity200m)
+                       BWPbuild$logAbun:BWPbuild$species:BWPbuild$buildingDensity200m)
 summary(BWPbuildspecies)#no signficance
 
 #join with fish-lake yr data for bass
