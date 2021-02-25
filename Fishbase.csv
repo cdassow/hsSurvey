@@ -1,0 +1,7 @@
+﻿species,depth range(m),pH range,max temp (Celsius),max length (cm),spawning temp (Celsius),spawning time (days),habitat,prey (adult),reproductive age (male),max weight (kg),trophic level,trophic std,generation time (years),resilience,common length (cm),max age (years)
+LARGEMOUTH BASS,0-6,7-7.5,32,97,15,29,overgrown banks clear water,fish and frogs,5,10.1,3.8,0.4,5.2,low,40,23
+SMALLMOUTH BASS,0-7,N/A,30,69,N/A,1,shallow rocky areas,crayfish and fish,N/A,5.4,3.6,0.2,6.8,medium,8,26
+BLACK CRAPPIE,N/A,6-7.5,31,49,N/A,5,vegetation over mud or sand most common in clear water,small fish,N/A,2.7,3.8,0.62,5.8,medium,27.5,15
+BLUEGILL,N/A,7-7.5,36,41,N/A,7,deep weed beds,snails crayfish and insects,N/A,2.2,3.2,0.2,N/A,medium,19,10
+YELLOW PERCH,0-56,N/A,30,50,N/A,Feb-July,clear water near vegetation,,N/A,1.9,3.7,0.2,3.4,medium,19.1,11
+WALLEYE,0-27,N/A,29,107,N/A,1,clear water usually near brush,insects and fish,N/A,11.3,4.5,0,3.7,low,54,29

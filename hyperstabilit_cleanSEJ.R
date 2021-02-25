@@ -459,3 +459,10 @@ fit=lmer(meanEF_CPEkm~adults.acre+(1|wbicFactor),data=cpueCheck)
 nullFit=lmer(meanEF_CPEkm~(1|wbicFactor),data=cpueCheck)
 
 anova(fit,nullFit)
+
+##### looking at fish ecology differences uses fish base data ####
+
+Fishbase<-read.csv("Fishbase.csv")
+Fishbase<-rename(Fishbase,"species"  = ï..species, )
+#joining fish base data to WDNR fish observations 
+BWPeco=full_join(Fishbase,BWPJoin, by="species" )
