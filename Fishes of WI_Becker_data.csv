@@ -1,0 +1,7 @@
+﻿Species ,beta,max length(mm),min length(mm),max depth in TL,min depth in TL,habitat,min spawning temp (Celsius),max spawning temp (Celsius),spawn start,spawn end,nest habitat,hatching time average (days),YOY average size (mm),min preffered water temp (Celsius),max preffered water temp (Celsius),water prefference,food conversion factor,prey,comments,
+Smallmouth Bass,0.211,349,233,4.8,3.7,rocky,12.8,23.9,May,June,gravel,5.875,26,21.1,26.7,shallow/epilimnion,4.5,crayifsh fish aqauatic insects,pp.799-808,
+Largemouth Bass,0.406,305,229,4.2,3.5,shallow sparse to dense vegetation,16.7,18.3,April,July,vegetation,5,32,27.2,30,shallow vegetation,4,fish crayfish frogs insects,pp.809-816,
+Bluegill,0.184,178,127,2.6,2.2,moderate amount of rooted vegetation,19.4,26.7,May,August,sand or gravel,2,19,27,31,clear water varying depths,N/A,aquatic insects crayfish small fish ,pp.844-851,check hatch time
+Black Crappie,0.189,254,178,3.5,2.9,shallow with abundant vegetation,17.8,20,May,June,vegetation sand or fine gravel,2.395833333,25,24,28.3,shallow clear warm water,N/A,fish and invertebrates,pp.863-868,
+Walleye,0.605,430,360,5.4,4.9,clear water over substrates of sand gravel ,5.6,10,April,May ,rocky shallows ,18,75,12.8,23.3,deeper darker in daytime and evening rocks/edge of weed beds,N/A,fish and invertebrates,pp.871-879 Depth into SL,
+Yellow Perch,0.051,229,127,3.8,3.3,shallows clear to turbid water,7.2,11.1,April ,May ,do not make nests,19,25,19.7,21,shallows in lakes with modest vegetation,N/A,fish and insects,pp.886-893 Depth into SL,
