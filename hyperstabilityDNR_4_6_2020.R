@@ -119,10 +119,54 @@ lake_yearWALLef= walleyeEF %>%
             N=n())
 lake_yearWALLef=as.data.frame(lake_yearWALLef)
 
+#bringing in walleye PEs from 2016 DNR survey to check efCPUE proxy for fish density 
+WalleyePE_2016=gdriveURL("https://drive.google.com/open?id=18e5zP5e5PuuCbeN0ShlWFMlcPgAbB4TV")
+WalleyePE_2016<-rename(WalleyePE_2016, WBICdate=ï.., WBIC=X , county=X.1, Lake=X.2, acres=X.3, surveyYear=X.4, adultwalleyePop=X.6, WalleyeDensity=X.7)
+WalleyePE_2016<-WalleyePE_2016[2:152,c(2:6,8:9)]
+
+WalleyePE_2016$surveyYear<-as.numeric(WalleyePE_2016$surveyYear)
+WalleyePE_2016$WBIC<-as.numeric(WalleyePE_2016$WBIC)
+WalleyePE_2016$WalleyeDensity<-as.numeric(WalleyePE_2016$WalleyeDensity)
+WalleyePE_2016$adultwalleyePop<-as.numeric(WalleyePE_2016$adultwalleyePop)
+
+#join walleye PE data with efCPUE walleye data, values in PE_2016 are integers
+WallPE<-full_join(lake_yearWALLef,WalleyePE_2016,by=c("WBIC","surveyYear"))
+WallPE<-WallPE[!is.na(WallPE$WalleyeDensity),]
+
+woTurtles<-WallPE[WallPE$adultwalleyePop<30000,]
+
+
+#log Transform 
+woTurtles$logCPUE=log(woTurtles$meanEF_CPEkm)
+woTurtles$logAbun=log(woTurtles$adultwalleyePop)
+woTurtles$logDens=log(woTurtles$WalleyeDensity)
+
+fit1<-glm(WallPE$logCPUE~WallPE$logAbun)
+summary(fit1)
+
+fit2<-glm(woTurtles$logCPUE~woTurtles$logAbun)
+summary(fit2)
+
+fit3<-glm(woTurtles$logCPUE~woTurtles$logDens)
+summary(fit3)
+
+plot(fit1)
+
+plot(x=WallPE$logAbun,y=WallPE$logCPUE)
+abline(fit1)
+
+plot(x=woTurtles$adultwalleyePop,y=woTurtles$meanEF_CPEkm)
+
+
+library(ggplot2)
+
+ggplot(data = woTurtles, aes(x=WalleyeDensity, y=meanEF_CPEkm))+geom_point()
+ggplot(data = woTurtles, aes(x=logDens, y=logCPUE))+geom_smooth(method="lm")
 
 ##### merge data sets from angling CPUE and electrofishing CPUE to get exact lake-year matches
 # convert fishSpeciesCode in lake_yearCPUE to species (name from ef stuff)
 lake_yearCPUE$species=""
+
 lake_yearCPUE$species[lake_yearCPUE$fishSpeciesCode=="X22"]="WALLEYE"
 lake_yearCPUE$species[lake_yearCPUE$fishSpeciesCode=="W11"]="SMALLMOUTH BASS"
 lake_yearCPUE$species[lake_yearCPUE$fishSpeciesCode=="W12"]="LARGEMOUTH BASS"
@@ -172,30 +216,32 @@ ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
 
 #smooth line making trendline of observations
 ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
-  geom_smooth(model=lm)
+  geom_smooth(model=lm)+xlab("Abundance (ef CPUE)")+ylab("Angling CPUE")
 #connecting with line 
 ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
   geom_line()
 
 #color coded by LMB or SMB
 ggplot(data=bassJoin,aes(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE))+
-  geom_point(aes(color=species))+theme(legend.position = "right")
-
-#ploting for walleye population
-ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
+  geom_point(aes(color=species))+theme(legend.position = "right")+
+  
+  #ploting for walleye population
+  ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
   geom_smooth(model=lm)
 
 ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
   geom_line()
 
 ggplot(data=wallJoin,aes(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE))+
-  geom_point()
+  geom_point()+theme_classic()+xlab("Abundance (ef CPUE)")+ylab("Angling CPUE")+
+  ggtitle("Walleye Hyperstability observations")
 
 
 #plotting for panfish species
 
 ggplot(data=panJoin,aes(x=panJoin$meanEF_CPEkm,y=panJoin$meanCPUE))+
-  geom_point(aes(color=species))+theme(legend.position = "right")
+  geom_point(aes(color=species))+theme(legend.position = "right")+xlab("Abundance (ef CPUE)")+ylab("Angling CPUE")+
+  ggtitle("Panfish Hyperstability observations")
 
 ######## log values and model fits #######
 
@@ -204,6 +250,7 @@ ggplot(data=panJoin,aes(x=panJoin$meanEF_CPEkm,y=panJoin$meanCPUE))+
 bassJoin$logCPUE=log(bassJoin$meanCPUE)
 bassJoin$logAbun=log(bassJoin$meanEF_CPEkm)
 bassJoin<- bassJoin[is.na(bassJoin$logCPUE)==F,]
+bassJoin<- bassJoin[is.na(bassJoin$logAbun)==F,]
 bassJoin<- bassJoin[bassJoin$logCPUE!=-Inf,]
 
 wallJoin$logCPUE=log(wallJoin$meanCPUE)
@@ -230,25 +277,30 @@ panJoin$PE.lcl=panJoin$std-panJoin$meanCPUE
 #join tables to compare species with lm model
 LMBplusWall=rbind(bassJoin[bassJoin$species=="LARGEMOUTH BASS",],wallJoin)
 #generate linear model to compare hyperstability of 
-LMBvsWall<-lm(LMBplusWall$logCPUE~LMBplusWall$logAbun*LMBplusWall$species)
+LMBvsWall<-lm(LMBplusWall$logCPUE~LMBplusWall$logAbun+LMBplusWall$logAbun:LMBplusWall$species)
 summary(LMBvsWall)
 #Walleye statistically significant different from LMB hyperstability similar lines on fit
 
 #Bass vs panfish
 LMBplusPan=rbind(bassJoin[bassJoin$species=="LARGEMOUTH BASS",],panJoin)
-LMBvsPan<- lm(LMBplusPan$logCPUE~LMBplusPan$logAbun*LMBplusPan$species)
+LMBvsPan<- lm(LMBplusPan$logCPUE~LMBplusPan$logAbun+LMBplusPan$logAbun:LMBplusPan$species)
 summary(LMBvsPan)
 
 #Panfish vs walleye 
 PanplusWall=rbind(panJoin,wallJoin)
-PanvsWall<-lm(PanplusWall$logCPUE~PanplusWall$logAbun*PanplusWall$species)
+PanvsWall<-lm(PanplusWall$logCPUE~PanplusWall$logAbun+PanplusWall$logAbun:PanplusWall$species)
 summary(PanvsWall)
 
 #general linear model for bass, using glm function 
-fit1<-glm(bassJoin$logCPUE~bassJoin$logAbun)
+fit1<-lm(bassJoin$logCPUE~bassJoin$logAbun)
 summary(fit1)
 
-LMBvsSMB<-lm(bassJoin$logCPUE~bassJoin$logAbun*bassJoin$species)
+plot(bassJoin$logCPUE~bassJoin$logAbun, data = bassJoin)
+abline(fit1)
+
+ggplot(bassJoin, aes(x=logAbun,y=logCPUE))+geom_point()+stat_smooth(method="lm", col="blue")
+
+LMBvsSMB<-lm(bassJoin$logCPUE~bassJoin$logAbun+bassJoin$logAbun:bassJoin$species)
 summary(LMBvsSMB)
 #both are hyperstable but largemouth bass are more hyperstable 
 
@@ -270,9 +322,8 @@ plot(x=bassJoin$meanEF_CPEkm,y=bassJoin$meanCPUE)
 plot(1:65,exp(fit1$coefficients[1])*(1:65)^fit1$coefficients[2], ylab="logCPUE (angling CPUE)", xlab="logAbun (efCPUE)", main = "Hyperstability of bass ")
 #can use lines function as well
 
-ggplot(bassJoin,aes(bassJoin$meanEF_CPEkm,bassJoin$meanCPUE))+
+ggplot(bassJoin,aes(meanEF_CPEkm,meanCPUE))+
   geom_point(aes(colour = surveyYear))
-ggplot(fit1,aes(bassJoin$meanEF_CPEkm,bassJoin$meanCPUE))+geom_smooth(model=lm)
 
 #model for panfish, fit summary estimate 0.23189 
 fit2<-glm(panJoin$logCPUE~panJoin$logAbun)
@@ -288,18 +339,18 @@ BLGfit<-glm(BLGJoin$logCPUE~BLGJoin$logAbun)
 summary(BLGfit)
 
 LMBplusBLG=rbind(bassJoin[bassJoin$species=="LARGEMOUTH BASS",],BLGJoin)
-LMBvsBLG<-lm(LMBplusBLG$logCPUE~LMBplusBLG$logAbun*LMBplusBLG$species)
+LMBvsBLG<-lm(LMBplusBLG$logCPUE~LMBplusBLG$logAbun+LMBplusBLG$logAbun:LMBplusBLG$species)
 summary(LMBvsBLG)
 #Walleye statistically significant different from LMB hyperstability similar lines on fit
 
 #Bass vs bluegill
 BassplusBLG=rbind(bassJoin,BLGJoin)
-BassvsBLG<-lm(BassplusBLG$logCPUE~BassplusBLG$logAbun*BassplusBLG$species)
+BassvsBLG<-lm(BassplusBLG$logCPUE~BassplusBLG$logAbun+BassplusBLG$logAbun:BassplusBLG$species)
 summary(BassvsBLG)#sign differences in effect just largemouth not smallmouth, not signif. diferent from Small
 
 #Bluegill vs walleye 
 BLGplusWall=rbind(BLGJoin,wallJoin)
-BLGvsWall<-lm(BLGplusWall$logCPUE~BLGplusWall$logAbun*BLGplusWall$species)
+BLGvsWall<-lm(BLGplusWall$logCPUE~BLGplusWall$logAbun+BLGplusWall$logAbun:BLGplusWall$species)
 summary(BLGvsWall)
 
 
@@ -317,17 +368,65 @@ summary(fit3)
 plot(x=wallJoin$logAbun,y=wallJoin$logCPUE)
 abline(fit3)
 
+
 #normal spcae plot of model fit to the data, exponential(intercept)*x^slope this is qN^B
 #coefficients 2 is beta
 plot(x=wallJoin$meanEF_CPEkm,y=wallJoin$meanCPUE)
 plot(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2])
 
-### Ploting hyperstability ###
+##### Ploting hyperstability #####
+
+#function to pull data from linear regression and return key values from Susan Johnston lab(Institute of Evolutionary Biology at the University of Edinburgh)
+ggplotRegression <- function (fit) {
+  
+  require(ggplot2)
+  
+  ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
+    geom_point() +
+    stat_smooth(method = "lm", col = "red") +
+    labs(subtitle = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
+                          "Intercept =",signif(fit$coef[[1]],5 ),
+                          " Slope =",signif(fit$coef[[2]], 5),
+                          " P =",signif(summary(fit)$coef[2,4], 5)))
+}
+
+#linear regression plots of catach vs abundance for walleye, bass, and Panfish
+ggplotRegression(lm(wallJoin$logCPUE~wallJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                             title = "Walleye linear model fit of catch vs abundance")
+
+ggplotRegression(lm(bassJoin$logCPUE~bassJoin$logAbun, data= bassJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                             title = "Bass linear model fit of catch vs abundance")
+
+ggplotRegression(lm(panJoin$logCPUE~panJoin$logAbun, data= wallJoin))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                           title = "Panfish linear model fit of catch vs abundance")
+
+ggplotRegression(lm(Wallbuild$logCPUE~Wallbuild$logAbun+Wallbuild$logAbun:Wallbuild$buildingDensity200m))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                                                               title = "Walleye linear model fit of catch vs abundance correlated with buidling density")
+#looking at different number of obs per species
+ggplot(BWPJoin, aes(x=meanEF_CPEkm, y=meanCPUE))+geom_point(aes(col=species))+facet_wrap(vars(species))+labs(x="Fish density (efCPUE)", y="Angling CPUE", title = "Catch rate vs Abundance observations by species")
+
+#looking at different number of observations over the years
+ggplot(BWPJoin, aes(x=meanEF_CPEkm, y=meanCPUE))+geom_point()+facet_wrap(vars(surveyYear))+labs(x="Fish density (efCPUE)", y="Angling CPUE",
+                                                                                                title = "Wisconsin DNR fish data CPUE calculations from 1995-2016")
+
+
 plot(x=1:165,y=exp(fit1$coefficients[1])*(1:165)^fit1$coefficients[2], col='blue', type = "l",ylim = c(0,5),
-     main = "Hyperstability of fish Species in WI")
+     main = "Hyperstability of fish Species in WI", xlab="Fish Abundance", ylab = "CPUE")
 lines(1:165,exp(fit2$coefficients[1])*(1:165)^fit2$coefficients[2],col="red")
 lines(1:165,exp(fit3$coefficients[1])*(1:165)^fit3$coefficients[2],col="darkgreen")
 legend("topright",paste("Fit = ",c("LMB","Panfish","Walleye")), lty = 1:5, col = 1:5)
+
+
+#combining all fish species to one lm
+
+BWJoin=full_join(bassJoin,wallJoin)
+BWPJoin=full_join(BWJoin,panJoin)
+
+BWPFit<-lm(BWPJoin$logCPUE~BWPJoin$logAbun)
+summary(BWPFit)
+
+BWPspeciesFit<-lm(BWPJoin$logCPUE~BWPJoin$logAbun+BWPJoin$logAbun:BWPJoin$species)
+summary(BWPspeciesFit)
 
 
 #using betaBootstrapping R script to calucate betas from model fit to simulated data
@@ -367,10 +466,109 @@ hist(ps)
 #lm(loganCPUE~logefCPUE*species), efCPUE + species + efCPUE:species
 #B0 + b1efCPUE + B2*species +B3efCPUE scpeies
 
-####Building Density ####
+####Building Density Using GIS files from WI Geo Database, (NTL database has a Vilas subset)####
+
+#add in Building density csv from GIS files from Hsbuild github repo on joneslabND
+buildDens<-read.csv("HSbuildingsSummary_yrs.csv")
+#formatting to join columns 
+buildDens$WBIC=buildDens$wbic
+buildDens=buildDens[,c(2:11,13)]
+
+
+#join with fish-lake yr data for all species
+BWPbuild=left_join(BWPJoin, buildDens, by="WBIC","county")
+BWPbuild=BWPbuild[!is.na(BWPbuild$buildingCount100m),]
+BWPbuild=BWPbuild[!is.na(BWPbuild$meanEF_CPEkm),]
+
+
+#looking at the relationship between catch abundance and building density 
+
+BWPbuildFit<-glm(BWPbuild$logCPUE~BWPbuild$logAbun+BWPbuild$logAbun:BWPbuild$buildingDensity200m)
+summary(BWPbuildFit)
+
+#relationship between catch abun building density and species 
+BWPbuildspecies<-glm(BWPbuild$logCPUE~BWPbuild$logAbun+BWPbuild$logAbun:BWPbuild$species+BWPbuild$logAbun:BWPbuild$buildingDensity200m+
+                       BWPbuild$logAbun:BWPbuild$species:BWPbuild$buildingDensity200m)
+summary(BWPbuildspecies)#no signficance
+
+#join with fish-lake yr data for bass
+Bassbuild=left_join(bassJoin, buildDens, by="WBIC","county")
+Bassbuild=Bassbuild[!is.na(Bassbuild$buildingCount100m),]
+Bassbuild=Bassbuild[!is.na(Bassbuild$meanEF_CPEkm),]
+#202 observations
+
+BassbuildFit<-glm(Bassbuild$logCPUE~Bassbuild$logAbun)
+summary(BassbuildFit)#hyperstabilty detected
+
+BassbuildFit200<-glm(Bassbuild$logCPUE~Bassbuild$logAbun+Bassbuild$logAbun:Bassbuild$buildingCount200m)
+summary(BassbuildFit200)#not sig
+
+#contstraining to 2006-2016, 98 obs
+BassbuildJoin=Bassbuild[Bassbuild$surveyYear.x>=2006,]
+
+BassbuildJFit<-glm(BassbuildJoin$logCPUE~BassbuildJoin$logAbun)
+summary(BassbuildJFit)#hyperstability detected
+
+BassbuildJFit200<-glm(BassbuildJoin$logCPUE~BassbuildJoin$logAbun+BassbuildJoin$logAbun:BassbuildJoin$buildingDensity200m)
+summary(BassbuildJFit200)#not sig
+
+SpeciesBuildB<-glm(BassbuildJoin$logCPUE~BassbuildJoin$logAbun+BassbuildJoin$logAbun:BassbuildJoin$species+BassbuildJoin$logAbun:BassbuildJoin$buildingDensity200m+
+                     BassbuildJoin$logAbun:BassbuildJoin$species:BassbuildJoin$buildingDensity200m)
+summary(SpeciesBuildB)
+
+#Walleye subset
+Wallbuild=left_join(wallJoin, buildDens, by="WBIC","county")
+Wallbuild=Wallbuild[!is.na(Wallbuild$buildingCount100m),]
+Wallbuild=Wallbuild[!is.na(Wallbuild$meanEF_CPEkm),]
+#198 observations
+
+WallbuildFit<-glm(Wallbuild$logCPUE~Wallbuild$logAbun)
+summary(WallbuildFit)#hyperstabilty detected
+
+WallbuildFit200<-glm(Wallbuild$logCPUE~Wallbuild$logAbun+Wallbuild$logAbun:Wallbuild$buildingDensity200m)
+summary(WallbuildFit200)#sig for all denisty m
+#contstraining to 2006-2016, 110 obs
+WallbuildJoin=Wallbuild[Wallbuild$surveyYear.x>=2006,]
+
+WallbuildJFit<-glm(WallbuildJoin$logCPUE~WallbuildJoin$logAbun)
+summary(WallbuildJFit)#hyperstability detected
+
+WallbuildJFit100<-glm(WallbuildJoin$logCPUE~WallbuildJoin$logAbun+WallbuildJoin$logAbun:WallbuildJoin$buildingDensity100m)
+summary(WallbuildJFit100)#sig for 100m and 200m density
+
+SpeciesBuildW<-glm(WallbuildJoin$logCPUE~WallbuildJoin$logAbun+WallbuildJoin$logAbun:WallbuildJoin$buildingDensity200m*WallbuildJoin$species)
+summary(SpeciesBuildW)#error in contrasts, can be applied only to factors with 2 or more levels
+
+#Panfish subset
+Panbuild=left_join(panJoin, buildDens, by="WBIC","county")
+Panbuild=Panbuild[!is.na(Panbuild$buildingCount100m),]
+Panbuild=Panbuild[!is.na(Panbuild$meanEF_CPEkm),]
+#135 observations
+
+PanbuildFit<-glm(Panbuild$logCPUE~Panbuild$logAbun)
+summary(PanbuildFit)#hyperstabilty detected
+
+PanbuildFit50<-glm(Panbuild$logCPUE~Panbuild$logAbun+Panbuild$logAbun:Panbuild$buildingCount200m)
+summary(PanbuildFit50)#not sig
+
+#contstraining to 2006-2016, 95 obs
+PanbuildJoin=Panbuild[Panbuild$surveyYear.x>=2006,]
+
+PanbuildJFit<-glm(PanbuildJoin$logCPUE~PanbuildJoin$logAbun)
+summary(PanbuildJFit)#hyperstability detected
+
+PanbuildJFit200<-glm(PanbuildJoin$logCPUE~PanbuildJoin$logAbun+PanbuildJoin$logAbun:PanbuildJoin$buildingDensity200m)
+summary(PanbuildJFit200)#not sig
+
+SpeciesBuildP<-glm(PanbuildJoin$logCPUE~PanbuildJoin$logAbun+PanbuildJoin$logAbun:PanbuildJoin$buildingDensity200m*PanbuildJoin$species)
+summary(SpeciesBuildP)
+
+###### NTL build comparison  #####
 
 #add in Building density *only for year 2016
 buildDensity2016=gdriveURL("https://drive.google.com/open?id=11lPPduqiXIxz00fm6xxFzUA8u9nCOBnN")
+
+bassbuild=left_join(buildDensity2016)
 
 #bringing in ntl buidling info for 2001-2004
 NTLBuild<- read.csv("NTLBuildDensData(2001-2004).csv")
@@ -385,12 +583,13 @@ NTLBuild<-NTLBuild[,c(1:4,8:34)]
 buildDensity2016$buildings_per_km2016=buildDensity2016$buildingCount50m/(buildDensity2016$lakePerimeter_m*0.001)
 
 buildDensCompare=full_join(buildDensity2016,NTLBuild, by="WBIC")
-buildDensCompare=buildDensCompare[!is.na(buildDensCompare$buildings_per_km.y),]
+buildDensCompare=buildDensCompare[!is.na(buildDensCompare$secchi),]
 
-plot(x=buildDensCompare$buildings_per_km.y,y=buildDensCompare$buildings_per_km.x, xlab= "NTL estiamte (2001-2004)",
-     ylab="2016 estimate (GIS)", main="Lake building density comparison of different years", xlim = )
+plot(x=buildDensCompare$buildings_per_km,y=buildDensCompare$buildings_per_km2016, xlab= "NTL estiamte (2001-2004)",
+     ylab="2016 estimate (GIS)", main="Lake building density comparison of different years")
 
-ggplot(data=buildDensCompare, aes(x=buildDensCompare$buildings_per_km.y,y=buildDensCompare$buildings_per_km.x))+geom_smooth()
+ggplot(data=buildDensCompare, aes(x=buildDensCompare$buildings_per_km,y=buildDensCompare$buildings_per_km2016))+geom_smooth()+
+  labs(x="NTL estiamte (2001-2004)", y="2016 estimate (GIS)", title= "Lake building density comparison of different years")
 
 
 #joining building density to bass catch + abund info
@@ -458,6 +657,13 @@ panbuildJoin0104<-panbuildJoin[panbuildJoin$surveyYear.x>2000 & panbuildJoin$sur
 #bringing in coarse woody habitat estimates from Jake Ziegler data from YOY mort. study
 CWHdensity=gdriveURL("https://drive.google.com/open?id=1x1_JdeamiU2auqrlPQ3G_wA6Spuf0vwf")
 #only 61 observations*
+
+#Joining lake year observation with CWH data (61 Vilas obs)
+BWPCWH=left_join(BWPJoin,CWHdensity,by="WBIC")
+BWPCWH=BWPCWH[!is.na(BWPCWH$Total.CWH.per.km.shoreline),]
+CWHfit<-glm(BWPCWH$logCPUE~BWPCWH$logAbun+BWPCWH$logAbun:BWPCWH$Total.CWH.per.km.shoreline)
+summary(CWHfit)
+
 
 bassCWHJoin=left_join(bassJoin,CWHdensity,by="WBIC")
 bassCWHJoin=bassCWHJoin[!is.na(bassCWHJoin$Total.CWH.per.km.shoreline),]
@@ -556,6 +762,13 @@ for(i in (1:nrow(lakeCWHVilas))){
 
 VilasCWHperKM<-lakeCWHVilas[,c(3,4)]
 
+#Joining to look at CWH for all observations
+BWPcwhNTL=left_join(BWPJoin, VilasCWHperKM, by="WBIC")
+BWPcwhNTL=BWPcwhNTL[!is.na(BWPcwhNTL$CWHkm),]
+
+NTLfit<-glm(BWPcwhNTL$logCPUE~BWPcwhNTL$logAbun+BWPcwhNTL$logAbun:BWPcwhNTL$CWHkm)
+summary(NTLfit)
+
 #joining to tables -- 1995-2016 year subset
 bassCWHJoin=left_join(bassJoin,VilasCWHperKM,by="WBIC")
 bassCWHJoin=bassCWHJoin[!is.na(bassCWHJoin$CWHkm),]
@@ -613,6 +826,8 @@ wallbuildCWHJoin=left_join(wallbuildJoin,CWHdensity,by="WBIC")
 wallbuildCWHJoin=wallbuildCWHJoin[!is.na(wallbuildCWHJoin$CWH.greater.than.10cm.per.km.shoreline),]
 #27 obs
 
+##### Lake charactersitic models #####
+
 #add in lake characterisitcs
 linfo<-gdriveURL("https://drive.google.com/open?id=1ot9rEYnCG07p7aUxbeqN2mJ3cNrzYA0Y")
 linfo=linfo[,1:13]
@@ -621,6 +836,31 @@ bassLinfo<-left_join(bassJoin,linfo,by="WBIC")
 wallLinfo<-left_join(wallJoin,linfo,by="WBIC")
 panLinfo<-left_join(panJoin,linfo,by="WBIC")
 BLGJoinLinfo<-left_join(BLGJoin,linfo,by="WBIC")
+
+#joing linfo with all observations
+BWPlinfo<-left_join(BWPJoin, linfo,by="WBIC")
+
+# max depth
+BWPDepth<-glm(BWPlinfo$logCPUE~BWPlinfo$logAbun+BWPlinfo$logAbun:BWPlinfo$maxDepth)
+summary(BWPDepth)#no 
+#lake size
+BWPLsize<-glm(BWPlinfo$logCPUE~BWPlinfo$logAbun+BWPlinfo$logAbun:BWPlinfo$sizeAcres)
+summary(BWPLsize)#no
+#lake type
+BWPLtype<-glm(BWPlinfo$logCPUE~BWPlinfo$logAbun+BWPlinfo$logAbun:BWPlinfo$lakeType)
+summary(BWPLtype)#no
+#water clarity
+BWPLclar<-glm(BWPlinfo$logCPUE~BWPlinfo$logAbun+BWPlinfo$logAbun:BWPlinfo$waterClarity)
+summary(BWPLclar)#no
+#mean depth
+BWPLmDepth<-glm(BWPlinfo$logCPUE~BWPlinfo$logAbun+BWPlinfo$logAbun:BWPlinfo$meanDepth)
+summary(BWPLmDepth)#no
+#survey year
+BWPLyear<-glm(BWPlinfo$logCPUE~BWPlinfo$logAbun+BWPlinfo$logAbun:BWPlinfo$surveyYear)
+summary(BWPLyear)#significant difference in beta, pos effect less hyperstability due to survey year
+#county
+BWPcounty<-glm(BWPlinfo$logCPUE~BWPlinfo$logAbun+BWPlinfo$logAbun:BWPlinfo$county.x)
+summary(BWPcounty)#some counties 
 
 
 #model fits, testing out bass first
@@ -770,3 +1010,4 @@ LMBfit<-glm(LMB$distEffortkm~LMB$nHat)
 summary(LMBfit)
 
 #do not see any hyperstability present for obs, only few may be the reason
+
