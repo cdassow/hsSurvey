@@ -184,11 +184,30 @@ BWPspeciesFit<-lm(BWPJoin$logCPUE~BWPJoin$logAbun*BWPJoin$species)
 summary(BWPspeciesFit)
 anova(BWPspeciesFit)
 
+BWPspecies_q_fit<-lm(BWPJoin$logCPUE~BWPJoin$logAbun+BWPJoin$species)
+BWPfit<-lm(BWPJoin$logCPUE~BWPJoin$logAbun)
+BWPspecies_int_fit<-lm(BWPJoin$logCPUE~BWPJoin$logAbun+BWPJoin$logAbun:BWPJoin$species)
+
+anova(BWPfit,BWPspecies_q_fit)
+anova(BWPfit,BWPspecies_int_fit)
+
+anova(BWPspecies_int_fit,BWPspeciesFit)
+anova(BWPspecies_q_fit,BWPspeciesFit)
+
 library(lme4)
 BWPJoin$WBICfactor=as.factor(BWPJoin$WBIC)
 BWPspeciesFit_random<-lmer(logCPUE~logAbun*species+(1|WBICfactor),data=BWPJoin)
+BWPqFit_random<-lmer(logCPUE~logAbun+species+(1|WBICfactor),data=BWPJoin)
+BWPintFit_random<-lmer(logCPUE~logAbun+logAbun:species+(1|WBICfactor),data=BWPJoin)
 BWPfit_random<-lmer(logCPUE~logAbun+(1|WBICfactor),data=BWPJoin)
+
+anova(BWPqFit_random,BWPfit_random)
+anova(BWPintFit_random,BWPfit_random)
+
 anova(BWPspeciesFit_random,BWPfit_random)  # species matter
+anova(BWPspeciesFit_random,BWPqFit_random)
+anova(BWPspeciesFit_random,BWPintFit_random)
+
 
 # individual fits to get SE and do posthoc comparison
 cur=BWPJoin[BWPJoin$species=="BLACK CRAPPIE",]
@@ -459,10 +478,3 @@ fit=lmer(meanEF_CPEkm~adults.acre+(1|wbicFactor),data=cpueCheck)
 nullFit=lmer(meanEF_CPEkm~(1|wbicFactor),data=cpueCheck)
 
 anova(fit,nullFit)
-
-##### looking at fish ecology differences uses fish base data ####
-
-Fishbase<-read.csv("Fishbase.csv")
-Fishbase<-rename(Fishbase,"species"  = ï..species, )
-#joining fish base data to WDNR fish observations 
-BWPeco=full_join(Fishbase,BWPJoin, by="species" )
