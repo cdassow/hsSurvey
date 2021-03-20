@@ -28,4 +28,22 @@ summary(Fish_Stemp_max<-lm(Fish$beta~Fish$max.spawning.temp..Celsius.)) #nope
 
 summary(Fish_Stemp_min<-lm(Fish$beta~Fish$min.spawning.temp..Celsius.)) #nope
 
-        
+# checking life history and catch ability 
+Fish$q <- c(0.287, 0.228, 1.272, 0.765, 0.040, 0.675)
+
+nullfitq=lm(Fish$q~1)
+
+summary(Fish_length<-lm(Fish$q~Fish$max.length.mm., Fish)) #small sig 0.009
+summary(Fish_length2<-lm(Fish$q~Fish$min.length.mm., Fish)) #almost/small 0.035
+summary(Fish_spawn_time<-lm(Fish$q~Fish$spawn.start, Fish)) #no
+summary(Fish_spawn_end<-lm(Fish$q~Fish$spawn.end, Fish)) #no
+summary(Fish_min_temp<-lm(Fish$q~Fish$min.preffered.water.temp..Celsius.))#no
+summary(Fish_max_temp<-lm(Fish$q~Fish$max.preffered.water.temp..Celsius.)) #no
+summary(Fish_YOY<-lm(Fish$q~Fish$YOY.average.size..mm.)) #no
+summary(Fish_hatch<-lm(Fish$q~Fish$hatching.time.average..days.)) #almost
+summary(Fish_Stemp_max<-lm(Fish$q~Fish$max.spawning.temp..Celsius.))#no
+summary(Fish_Stemp_min<-lm(Fish$q~Fish$min.spawning.temp..Celsius.))#no
+
+anova(Fish_length,nullfitq)
+anova(Fish_length2,nullfitq)
+
