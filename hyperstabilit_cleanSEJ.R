@@ -478,3 +478,35 @@ fit=lmer(meanEF_CPEkm~adults.acre+(1|wbicFactor),data=cpueCheck)
 nullFit=lmer(meanEF_CPEkm~(1|wbicFactor),data=cpueCheck)
 
 anova(fit,nullFit)
+
+#### looking at WDNR walleye PE vs efCPUE ####
+
+#join by WBIC, surveyYear
+library(stringr)
+WallPE=read.csv("WalleyeData_Age0toAge1MortalitywithPE_Zebro_9_18_20.csv")
+WallPE=WallPE[2:645,]
+#WallPE$surveyYear<-str_sub(WallPE$ï..Age.0.to.age.1.mortality.with.PE.for.cultivation.depensation.ms,start=-4)
+#WallPE$WBIC=str_sub(WallPE$ï..Age.0.to.age.1.mortality.with.PE.for.cultivation.depensation.ms,end=-5)
+WallPE=rename(WallPE, WBIC = X, surveyYear = X.4 , PE = X.8 , Density = X.9)
+WallPE=WallPE[2:644,c(2,6,10:11)]
+WallPE_2018=read.csv("WalleyeWDNR_18-20_PEs.csv") #REFDATE = Survey year, NumberAcre is the density of adult walleye
+WallPE_2018=rename(WallPE_2018, WBIC = ï..MWBCODE, surveyYear = REFDATE, PE = NUMBER, Density = NUMACRE)
+WallPE_2018=WallPE_2018[,c(1,6,8,15)]
+WallPE$WBIC <-as.integer(as.character(WallPE$WBIC))
+WallPE$surveyYear<-as.integer(as.character(WallPE$surveyYear))
+WallPE$PE<-as.integer(as.character(WallPE$PE))
+WallPE$Density<-as.numeric((as.character(WallPE$Density)))
+
+WallPE=full_join(WallPE,WallPE_2018)
+
+rownames(WallPE) = seq(length=nrow(WallPE)) #final df 767 observations of Walleye PE's from WDNR
+
+cpueCheck_WDNR=full_join(lake_yearWALLef,WallPE,by=c("WBIC","surveyYear"))
+
+cpueCheck_WDNR=cpueCheck_WDNR[!is.na(cpueCheck_WDNR$Density),]
+cpueCheck_WDNR$wbicFactor=as.factor(cpueCheck_WDNR$WBIC)
+
+par(mfrow=c(1,1))
+plot(cpueCheck_WDNR$Density,cpueCheck_WDNR$meanEF_CPEkm)
+lm_fit=lm(meanEF_CPEkm~Density,data=cpueCheck_WDNR)
+abline(lm_fit,lwd=2,col='red')
