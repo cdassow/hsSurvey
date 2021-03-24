@@ -510,3 +510,8 @@ par(mfrow=c(1,1))
 plot(cpueCheck_WDNR$Density,cpueCheck_WDNR$meanEF_CPEkm)
 lm_fit=lm(meanEF_CPEkm~Density,data=cpueCheck_WDNR)
 abline(lm_fit,lwd=2,col='red')
+
+fit=lmer(meanEF_CPEkm~Density+(1|wbicFactor),data=cpueCheck_WDNR)
+nullFit=lmer(meanEF_CPEkm~(1|wbicFactor),data=cpueCheck_WDNR)
+
+anova(fit,nullFit)
