@@ -47,3 +47,7 @@ summary(Fish_Stemp_min<-lm(Fish$q~Fish$min.spawning.temp..Celsius.))#no
 anova(Fish_length,nullfitq)
 anova(Fish_length2,nullfitq)
 
+#catchability and beta relationship
+anova(lm(Fish$q~1),lm(Fish$q~Fish$beta)) #q note predictor of beta?
+
+
