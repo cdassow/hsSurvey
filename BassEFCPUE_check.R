@@ -1,3 +1,5 @@
+#Bass efCPUE check with Fishcapes survey (2018-2019)
+#SEJ, CM 7-9-2021
 #source the dbUtil.R
 setwd("C:/Users/mosle/Documents/JonesLakeExperiment_Datasheets_2020")
 source("dbUtil.r")
@@ -71,7 +73,7 @@ names(PEs)=names(efCPE)
 
 plot(PEs,efCPE)
 model=lm(efCPE~PEs)
-abline(model,lm_fit,lwd=2,col='blue')
+abline(model,lwd=2,col='blue')
 
 null=lm(efCPE~1)
 anova(model,null)
