@@ -261,6 +261,19 @@ text(130,1.8,expression(beta=="0.63"))
 betas=c('BLC'=0.18,"BLG"=0.21,"YWP"=0.05,"LMB"=0.41,"SMB"=0.24,"WYE"=0.63)
 betasWrand=c('BLC'=0.189,"BLG"=0.184,"YWP"=0.051,"LMB"=0.406,"SMB"=0.211,"WYE"=0.605)
 
+species<-c('BLC',"BLG","YWP","LMB","SMB","WYE")
+#plot betas with error
+sdev=c('BLC'=0.063,"BLG"=0.040,"YWP"=0.046,"LMB"=0.027,"SMB"=0.032,"WYE"=0.045)
+x<-1:6
+plot(x, betas,
+    ylim=range(0.004:1.235),
+    pch=19, xlab="Betas", ylab="Mean +/- SD",
+    main="Beta plots with std.dev error bars 95% CI", col="blue", xlim = range(1:7)
+)
+
+# hack: we draw arrows but with very special "arrowheads"
+arrows(x, betas-(1.96*sdev), x, betas+(1.96*sdev), length=0.05, angle=90, code=3)
+text(x, betas, species, cex=0.6, pos=4, col="red")
 
 
 ##********* lake characteristics using Hansen et al. dataset
